@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:profesh_forms/constants.dart';
-import 'package:profesh_forms/screens/already_applied_screen.dart';
+import 'package:profesh_forms/screens/upload_video_screen.dart'; // Add this import
 import '../services/api_service.dart';
 
 class UploadCVScreen extends StatefulWidget {
@@ -128,13 +128,13 @@ class _UploadCVScreenState extends State<UploadCVScreen>
         });
 
         if (response['success'] == true) {
+          // Navigate to video upload screen after successful CV upload
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => const AlreadyAppliedScreen(
-                title: 'CV Uploaded Successfully!',
-                message: 'Your CV has been uploaded. You can now add a video resume or submit your application.',
-                showDownloadButton: true,
+              builder: (context) => UploadVideoScreen(
+                jobId: widget.jobId,
+                userData: widget.userData,
               ),
             ),
           );
@@ -164,6 +164,19 @@ class _UploadCVScreenState extends State<UploadCVScreen>
         );
       }
     }
+  }
+
+  Future<void> _skipToVideo() async {
+    // Navigate to video upload screen when skipping CV
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UploadVideoScreen(
+          jobId: widget.jobId,
+          userData: widget.userData,
+        ),
+      ),
+    );
   }
 
   @override
@@ -666,18 +679,7 @@ class _UploadCVScreenState extends State<UploadCVScreen>
             width: double.infinity,
             height: 60,
             child: OutlinedButton(
-              onPressed: _isUploading ? null : () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AlreadyAppliedScreen(
-                      title: 'Application Submitted!',
-                      message: 'Your application has been successfully submitted. Thank you for applying!',
-                      showDownloadButton: true,
-                    ),
-                  ),
-                );
-              },
+              onPressed: _isUploading ? null : _skipToVideo, // Changed this line
               style: OutlinedButton.styleFrom(
                 side: BorderSide(
                   color: ThemeColors.mauve300.color, 

@@ -17,8 +17,6 @@ class JobApplicationApp extends StatelessWidget {
         useMaterial3: true,
         brightness: Brightness.dark,
         scaffoldBackgroundColor: ThemeColors.black.color,
-        
-        // Color scheme with modern colors
         colorScheme: ColorScheme.dark(
           primary: ThemeColors.lime500.color,
           primaryContainer: ThemeColors.lime700.color,
@@ -26,16 +24,13 @@ class JobApplicationApp extends StatelessWidget {
           secondaryContainer: ThemeColors.mauve500.color,
           tertiary: ThemeColors.slateGreen200.color,
           surface: ThemeColors.slateGreen900.color,
-          background: ThemeColors.black.color,
           error: ThemeColors.red.color,
           onPrimary: ThemeColors.slateGreen900.color,
           onSecondary: ThemeColors.neutral1.color,
           onSurface: ThemeColors.neutral1.color,
-          onBackground: ThemeColors.neutral1.color,
           outline: ThemeColors.neutral4.color,
         ),
-        
-        // Updated text theme with better hierarchy
+
         textTheme: TextTheme(
           displayLarge: TextStyle(
             color: ThemeColors.neutral1.color,
@@ -118,7 +113,7 @@ class JobApplicationApp extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
-        
+
         // Modern app bar theme
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.transparent,
@@ -129,11 +124,9 @@ class JobApplicationApp extends StatelessWidget {
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
-          iconTheme: IconThemeData(
-            color: ThemeColors.mauve300.color,
-          ),
+          iconTheme: IconThemeData(color: ThemeColors.mauve300.color),
         ),
-        
+
         // Enhanced elevated button theme
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -145,26 +138,26 @@ class JobApplicationApp extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           ),
         ),
-        
+
         // Modern outlined button theme
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
-            side: BorderSide(
-              color: ThemeColors.mauve300.color,
-              width: 2,
-            ),
+            side: BorderSide(color: ThemeColors.mauve300.color, width: 2),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           ),
         ),
-        
+
         // Input decoration theme with modern styling
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: ThemeColors.slateGreen900.color.withValues(alpha: 0.3),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 16,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
@@ -181,36 +174,24 @@ class JobApplicationApp extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(
-              color: ThemeColors.lime500.color,
-              width: 2,
-            ),
+            borderSide: BorderSide(color: ThemeColors.lime500.color, width: 2),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(
-              color: ThemeColors.red.color,
-              width: 1.5,
-            ),
+            borderSide: BorderSide(color: ThemeColors.red.color, width: 1.5),
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(
-              color: ThemeColors.red.color,
-              width: 2,
-            ),
+            borderSide: BorderSide(color: ThemeColors.red.color, width: 2),
           ),
           labelStyle: TextStyle(
             color: ThemeColors.mauve300.color,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
-          hintStyle: TextStyle(
-            color: ThemeColors.neutral3.color,
-            fontSize: 16,
-          ),
+          hintStyle: TextStyle(color: ThemeColors.neutral3.color, fontSize: 16),
         ),
-        
+
         // Card theme for modern containers
         // cardTheme: CardTheme(
         //   elevation: 8,
@@ -220,18 +201,16 @@ class JobApplicationApp extends StatelessWidget {
         //   ),
         //   color: ThemeColors.slateGreen900.color.withValues(alpha: 0.3),
         // ),
-        
+
         // Icon theme
-        iconTheme: IconThemeData(
-          color: ThemeColors.mauve300.color,
-        ),
-        
+        iconTheme: IconThemeData(color: ThemeColors.mauve300.color),
+
         // Divider theme
         dividerTheme: DividerThemeData(
           color: ThemeColors.neutral4.color.withValues(alpha: 0.3),
           thickness: 1,
         ),
-        
+
         // Snackbar theme for error messages
         snackBarTheme: SnackBarThemeData(
           backgroundColor: ThemeColors.slateGreen900.color,
@@ -245,7 +224,7 @@ class JobApplicationApp extends StatelessWidget {
           ),
           behavior: SnackBarBehavior.floating,
         ),
-        
+
         // Progress indicator theme
         progressIndicatorTheme: ProgressIndicatorThemeData(
           color: ThemeColors.lime500.color,

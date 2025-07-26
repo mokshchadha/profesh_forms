@@ -15,7 +15,7 @@ class _LandingScreenState extends State<LandingScreen>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
-  
+
   Map<String, dynamic>? jobData;
   bool isLoading = true;
   String? jobId;
@@ -27,22 +27,18 @@ class _LandingScreenState extends State<LandingScreen>
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
-    
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-    ));
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
 
     _loadJobData();
   }
@@ -56,15 +52,15 @@ class _LandingScreenState extends State<LandingScreen>
   Future<void> _loadJobData() async {
     // Extract jobId from URL parameters (simulate for now)
     jobId = "job123"; // In real app, get from URL params
-    
+
     final apiService = ApiService();
     final response = await apiService.getJobDetails(jobId!);
-    
+
     setState(() {
       jobData = response;
       isLoading = false;
     });
-    
+
     _animationController.forward();
   }
 
@@ -96,9 +92,7 @@ class _LandingScreenState extends State<LandingScreen>
             ],
           ),
         ),
-        child: isLoading
-            ? _buildLoadingScreen()
-            : _buildJobContent(),
+        child: isLoading ? _buildLoadingScreen() : _buildJobContent(),
       ),
     );
   }
@@ -113,10 +107,7 @@ class _LandingScreenState extends State<LandingScreen>
             decoration: BoxDecoration(
               color: ThemeColors.mauve100.color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
-              border: Border.all(
-                color: ThemeColors.mauve300.color,
-                width: 2,
-              ),
+              border: Border.all(color: ThemeColors.mauve300.color, width: 2),
             ),
             child: CircularProgressIndicator(
               color: ThemeColors.mauve300.color,
@@ -146,18 +137,14 @@ class _LandingScreenState extends State<LandingScreen>
     return SafeArea(
       child: Center(
         child: Container(
-          width: isDesktop 
-              ? 800
-              : double.infinity,
+          width: isDesktop ? 800 : double.infinity,
           child: SingleChildScrollView(
             child: FadeTransition(
               opacity: _fadeAnimation,
               child: SlideTransition(
                 position: _slideAnimation,
                 child: Padding(
-                  padding: EdgeInsets.all(
-                    isMobile ? 16.0 : 24.0,
-                  ),
+                  padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -200,10 +187,7 @@ class _LandingScreenState extends State<LandingScreen>
             height: isMobile ? 60 : 80,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(
-                color: ThemeColors.lime500.color,
-                width: 3,
-              ),
+              border: Border.all(color: ThemeColors.lime500.color, width: 3),
               boxShadow: [
                 BoxShadow(
                   color: ThemeColors.lime500.color.withValues(alpha: 0.3),
@@ -243,9 +227,9 @@ class _LandingScreenState extends State<LandingScreen>
               ),
             ),
           ),
-          
+
           SizedBox(width: isMobile ? 16 : 20),
-          
+
           // Middle content
           Expanded(
             child: Column(
@@ -275,7 +259,7 @@ class _LandingScreenState extends State<LandingScreen>
               ],
             ),
           ),
-          
+
           // Logo on the right
           Container(
             width: isMobile ? 50 : 60,
@@ -362,8 +346,8 @@ class _LandingScreenState extends State<LandingScreen>
                 ),
                 SizedBox(height: isMobile ? 10 : 12),
                 Text(
-                  jobData?['description'] ?? 
-                  'We are looking for a talented developer to join our team. This is an exciting opportunity to work on cutting-edge projects and grow your career.',
+                  jobData?['description'] ??
+                      'We are looking for a talented developer to join our team. This is an exciting opportunity to work on cutting-edge projects and grow your career.',
                   style: TextStyle(
                     color: ThemeColors.neutral2.color,
                     fontSize: isMobile ? 14 : 16,
@@ -375,19 +359,19 @@ class _LandingScreenState extends State<LandingScreen>
             ),
           ),
           SizedBox(height: isMobile ? 16 : 20),
-          isMobile 
+          isMobile
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildInfoChip(
-                      Icons.location_on, 
+                      Icons.location_on,
                       jobData?['location'] ?? 'Remote',
                       ThemeColors.mauve300.color,
                       ThemeColors.mauve100.color,
                     ),
                     const SizedBox(height: 8),
                     _buildInfoChip(
-                      Icons.access_time, 
+                      Icons.access_time,
                       jobData?['type'] ?? 'Full-time',
                       ThemeColors.slateGreen200.color,
                       ThemeColors.slateGreen100.color,
@@ -399,13 +383,13 @@ class _LandingScreenState extends State<LandingScreen>
                   runSpacing: 8,
                   children: [
                     _buildInfoChip(
-                      Icons.location_on, 
+                      Icons.location_on,
                       jobData?['location'] ?? 'Remote',
                       ThemeColors.mauve300.color,
                       ThemeColors.mauve100.color,
                     ),
                     _buildInfoChip(
-                      Icons.access_time, 
+                      Icons.access_time,
                       jobData?['type'] ?? 'Full-time',
                       ThemeColors.slateGreen200.color,
                       ThemeColors.slateGreen100.color,
@@ -417,31 +401,29 @@ class _LandingScreenState extends State<LandingScreen>
     );
   }
 
-  Widget _buildInfoChip(IconData icon, String text, Color borderColor, Color bgColor) {
+  Widget _buildInfoChip(
+    IconData icon,
+    String text,
+    Color borderColor,
+    Color bgColor,
+  ) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 600;
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 12 : 16, 
+        horizontal: isMobile ? 12 : 16,
         vertical: isMobile ? 6 : 8,
       ),
       decoration: BoxDecoration(
         color: bgColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: borderColor.withValues(alpha: 0.3),
-          width: 1,
-        ),
+        border: Border.all(color: borderColor.withValues(alpha: 0.3), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: borderColor,
-            size: isMobile ? 14 : 16,
-          ),
+          Icon(icon, color: borderColor, size: isMobile ? 14 : 16),
           SizedBox(width: isMobile ? 4 : 6),
           Flexible(
             child: Text(
@@ -459,11 +441,11 @@ class _LandingScreenState extends State<LandingScreen>
       ),
     );
   }
- 
+
   Widget _buildApplyButton() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 600;
-    final isDesktop = screenWidth > 1200;
+    final isDesktop = screenWidth > 720;
 
     return Center(
       child: Container(
@@ -471,10 +453,7 @@ class _LandingScreenState extends State<LandingScreen>
         height: isMobile ? 56 : 60,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              ThemeColors.lime200.color,
-              ThemeColors.lime500.color,
-            ],
+            colors: [ThemeColors.lime200.color, ThemeColors.lime500.color],
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [

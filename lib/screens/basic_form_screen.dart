@@ -473,7 +473,7 @@ class _BasicFormScreenState extends State<BasicFormScreen>
 
   Widget _buildSubmitButton() {
     return Container(
-      width: double.infinity,
+      width: MediaQuery.of(context).size.width > 720 ?280 : double.infinity,
       height: 60,
       decoration: BoxDecoration(
         gradient: LinearGradient(

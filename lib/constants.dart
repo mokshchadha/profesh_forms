@@ -41,25 +41,7 @@ extension AvatarsExtension on Avatars {
     }
   }
 }
-
-enum AnalyticsEvents {
-  view_cv_open,
-  view_cv_closed,
-  accepted_video_cv,
-  rejected_video_cv,
-  video_loaded,
-  video_skipped,
-  navigated_to_shortlisted,
-  navigated_to_home,
-  navigated_from_home,
-  schedule_interview,
-  cancel_interview,
-  remove_shortlisted,
-  clicked_banner,
-  register_webinar,
-  deny_video_update,
-}
-
+ 
 enum CandidateStatus { shortlisted, viewed, rejected, unreviewed }
 
 enum InterviewStatus { schedule, invalid }
@@ -194,81 +176,23 @@ extension ThemeColorExtension on ThemeColors {
 }
 
 enum Images {
-  bgShiftedUp,
-  bgShiftedDown,
-  bgStar,
+
   logo,
-  bgSimple,
-  resumeSuccess,
-  bgBlack,
-  bgLanding,
-  bgBlackAndWhite,
-  landingImage,
-  recruiterProfileBg,
-  resumeSuccessBg,
-  bgDesignBlack,
+  
 }
 
 extension ImagesExtension on Images {
   AssetImage get assetImage {
     switch (this) {
-      case Images.bgShiftedUp:
-        return const AssetImage('assets/bg_shifted_up.png');
-      case Images.bgShiftedDown:
-        return const AssetImage('assets/bg_c.png');
-      case Images.bgStar:
-        return const AssetImage('assets/bg_1.png');
-      case Images.logo:
+    case Images.logo:
         return const AssetImage('assets/logo.png');
-      case Images.bgSimple:
-        return const AssetImage('assets/bg_simple.png');
-      case Images.resumeSuccess:
-        return const AssetImage('assets/resume_uploaded.png');
-      case Images.bgBlack:
-        return const AssetImage('assets/bg_black.jpg');
-      case Images.bgLanding:
-        return const AssetImage('assets/bg_landing.png');
-      case Images.bgBlackAndWhite:
-        return const AssetImage('assets/bg_black_and_white.png');
-      case Images.landingImage:
-        return const AssetImage('assets/landing.png');
-      case Images.recruiterProfileBg:
-        return const AssetImage('assets/profile_bg.png');
-      case Images.resumeSuccessBg:
-        return const AssetImage('assets/resume_success_bg.png');
-      case Images.bgDesignBlack:
-        return const AssetImage('assets/bg_design_black.png');
     }
   }
 
   String get path {
     switch (this) {
-      case Images.bgShiftedUp:
-        return 'assets/bg_shifted_up.png';
-      case Images.bgShiftedDown:
-        return 'assets/bg_shifted_down.png';
-      case Images.bgStar:
-        return 'assets/bg_star.png';
-      case Images.logo:
+    case Images.logo:
         return 'assets/logo.png';
-      case Images.bgSimple:
-        return 'assets/bg_simple.png';
-      case Images.resumeSuccess:
-        return 'assets/resume_uploaded.png';
-      case Images.bgBlack:
-        return 'assets/bg_black.jpg';
-      case Images.bgLanding:
-        return 'assets/bg_landing.png';
-      case Images.bgBlackAndWhite:
-        return 'assets/bg_black_and_white.png';
-      case Images.landingImage:
-        return 'assets/landing.png';
-      case Images.recruiterProfileBg:
-        return 'assets/profile_bg.png';
-      case Images.resumeSuccessBg:
-        return 'assets/resume_success_bg.png';
-      case Images.bgDesignBlack:
-        return 'assets/bg_design_black.png';
     }
   }
 }

@@ -68,12 +68,21 @@ class _LandingScreenState extends State<LandingScreen>
     _animationController.forward();
   }
 
+  String _getCompanyImageUrl() {
+    if (jobData != null && jobData!['company'] != null) {
+      // Use UI Avatars as fallback with company name
+      final companyName = jobData!['company'] as String;
+      return 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(companyName)}&background=B3F00D&color=2A4B4E&size=200&rounded=true&bold=true';
+    }
+    return 'https://ui-avatars.com/api/?name=Company&background=B3F00D&color=2A4B4E&size=200&rounded=true&bold=true';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        width: double.infinity, // Fix for desktop - ensures full width
-        height: double.infinity, // Fix for desktop - ensures full height
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -135,10 +144,10 @@ class _LandingScreenState extends State<LandingScreen>
     final isMobile = screenWidth <= 600;
 
     return SafeArea(
-      child: Center( // Center content on desktop
+      child: Center(
         child: Container(
           width: isDesktop 
-              ? 800 // Max width for desktop
+              ? 800
               : double.infinity,
           child: SingleChildScrollView(
             child: FadeTransition(
@@ -147,19 +156,17 @@ class _LandingScreenState extends State<LandingScreen>
                 position: _slideAnimation,
                 child: Padding(
                   padding: EdgeInsets.all(
-                    isMobile ? 16.0 : 24.0, // Smaller padding on mobile
+                    isMobile ? 16.0 : 24.0,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildHeader(),
+                      _buildTopSection(),
                       SizedBox(height: isMobile ? 24 : 40),
                       _buildJobCard(),
                       SizedBox(height: isMobile ? 24 : 40),
-                      // _buildFeaturesList(),
-                      // SizedBox(height: isMobile ? 24 : 40),
                       _buildApplyButton(),
-                      if (isDesktop) const SizedBox(height: 40), // Extra space on desktop
+                      if (isDesktop) const SizedBox(height: 40),
                     ],
                   ),
                 ),
@@ -171,7 +178,7 @@ class _LandingScreenState extends State<LandingScreen>
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildTopSection() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 600;
 
@@ -187,53 +194,112 @@ class _LandingScreenState extends State<LandingScreen>
       ),
       child: Row(
         children: [
+          // Company Image Circle on the left
           Container(
-            padding: EdgeInsets.all(isMobile ? 12 : 16),
+            width: isMobile ? 60 : 80,
+            height: isMobile ? 60 : 80,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  ThemeColors.mauve300.color,
-                  ThemeColors.mauve500.color,
-                ],
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: ThemeColors.lime500.color,
+                width: 3,
               ),
-              borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: ThemeColors.mauve300.color.withOpacity(0.3),
+                  color: ThemeColors.lime500.color.withOpacity(0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
               ],
             ),
-            child: Icon(
-              Icons.work_outline,
-              color: ThemeColors.neutral1.color,
-              size: isMobile ? 24 : 28,
+            child: ClipOval(
+              child: Image.network(
+                _getCompanyImageUrl(),
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  // Fallback to a default avatar if network image fails
+                  return Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          ThemeColors.lime200.color,
+                          ThemeColors.lime500.color,
+                        ],
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        jobData?['company']?[0] ?? 'C',
+                        style: TextStyle(
+                          color: ThemeColors.slateGreen900.color,
+                          fontSize: isMobile ? 24 : 32,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
+          
           SizedBox(width: isMobile ? 16 : 20),
+          
+          // Middle content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Job Opportunity',
+                  jobData?['title'] ?? 'Software Engineer',
                   style: TextStyle(
                     color: ThemeColors.mauve100.color,
-                    fontSize: isMobile ? 22 : 26,
+                    fontSize: isMobile ? 20 : 24,
                     fontWeight: FontWeight.bold,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Find your perfect role',
+                  jobData?['company'] ?? 'Tech Company',
                   style: TextStyle(
                     color: ThemeColors.slateGreen200.color,
-                    fontSize: isMobile ? 12 : 14,
+                    fontSize: isMobile ? 14 : 16,
                     fontWeight: FontWeight.w500,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
+            ),
+          ),
+          
+          // Logo on the right
+          Container(
+            width: isMobile ? 50 : 60,
+            height: isMobile ? 50 : 60,
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: ThemeColors.neutral1.color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: ThemeColors.mauve300.color.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: Image.asset(
+              Images.logo.path,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                // Fallback icon if logo asset is not found
+                return Icon(
+                  Icons.business,
+                  color: ThemeColors.mauve300.color,
+                  size: isMobile ? 24 : 32,
+                );
+              },
             ),
           ),
         ],
@@ -272,70 +338,6 @@ class _LandingScreenState extends State<LandingScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: isMobile ? 56 : 64,
-                height: isMobile ? 56 : 64,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      ThemeColors.lime200.color,
-                      ThemeColors.lime500.color,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: ThemeColors.lime500.color.withOpacity(0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    jobData?['company']?[0] ?? 'C',
-                    style: TextStyle(
-                      color: ThemeColors.slateGreen900.color,
-                      fontSize: isMobile ? 20 : 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(width: isMobile ? 16 : 20),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      jobData?['title'] ?? 'Software Engineer',
-                      style: TextStyle(
-                        color: ThemeColors.neutral1.color,
-                        fontSize: isMobile ? 18 : 22,
-                        fontWeight: FontWeight.bold,
-                        height: 1.2,
-                      ),
-                      maxLines: 2, // Prevent overflow on mobile
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      jobData?['company'] ?? 'Tech Company',
-                      style: TextStyle(
-                        color: ThemeColors.mauve300.color,
-                        fontSize: isMobile ? 14 : 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 1, // Prevent overflow on mobile
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
           SizedBox(height: isMobile ? 20 : 24),
           Container(
             padding: EdgeInsets.all(isMobile ? 14 : 16),
@@ -373,9 +375,8 @@ class _LandingScreenState extends State<LandingScreen>
             ),
           ),
           SizedBox(height: isMobile ? 16 : 20),
-          // Fix for mobile overflow - make chips wrap or stack
           isMobile 
-              ? Column( // Stack chips vertically on mobile
+              ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildInfoChip(
@@ -393,7 +394,7 @@ class _LandingScreenState extends State<LandingScreen>
                     ),
                   ],
                 )
-              : Wrap( // Use Wrap for desktop/tablet to handle overflow
+              : Wrap(
                   spacing: 12,
                   runSpacing: 8,
                   children: [
@@ -442,7 +443,7 @@ class _LandingScreenState extends State<LandingScreen>
             size: isMobile ? 14 : 16,
           ),
           SizedBox(width: isMobile ? 4 : 6),
-          Flexible( // Allow text to wrap if needed
+          Flexible(
             child: Text(
               text,
               style: TextStyle(
@@ -466,7 +467,7 @@ class _LandingScreenState extends State<LandingScreen>
 
     return Center(
       child: Container(
-        width: isDesktop ? 280 : double.infinity, // Smaller width on desktop
+        width: isDesktop ? 280 : double.infinity,
         height: isMobile ? 56 : 60,
         decoration: BoxDecoration(
           gradient: LinearGradient(

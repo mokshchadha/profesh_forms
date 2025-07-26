@@ -50,7 +50,7 @@ class _LandingScreenState extends State<LandingScreen>
   }
 
   Future<void> _loadJobData() async {
-    // Extract jobId from URL parameters (simulate for now)
+    // Extract jobId from URL parameters (simulate for now) 
     jobId = "job123"; // In real app, get from URL params
 
     final apiService = ApiService();
@@ -66,7 +66,6 @@ class _LandingScreenState extends State<LandingScreen>
 
   String _getCompanyImageUrl() {
     if (jobData != null && jobData!['company'] != null) {
-      // Use UI Avatars as fallback with company name
       final companyName = jobData!['company'] as String;
       return 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(companyName)}&background=B3F00D&color=2A4B4E&size=200&rounded=true&bold=true';
     }
@@ -181,7 +180,6 @@ class _LandingScreenState extends State<LandingScreen>
       ),
       child: Row(
         children: [
-          // Company Image Circle on the left
           Container(
             width: isMobile ? 60 : 80,
             height: isMobile ? 60 : 80,
@@ -201,7 +199,6 @@ class _LandingScreenState extends State<LandingScreen>
                 _getCompanyImageUrl(),
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
-                  // Fallback to a default avatar if network image fails
                   return Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
@@ -229,8 +226,6 @@ class _LandingScreenState extends State<LandingScreen>
           ),
 
           SizedBox(width: isMobile ? 16 : 20),
-
-          // Middle content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,8 +254,6 @@ class _LandingScreenState extends State<LandingScreen>
               ],
             ),
           ),
-
-          // Logo on the right
           Container(
             width: isMobile ? 50 : 60,
             height: isMobile ? 50 : 60,
@@ -277,7 +270,6 @@ class _LandingScreenState extends State<LandingScreen>
               Images.logo.path,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
-                // Fallback icon if logo asset is not found
                 return Icon(
                   Icons.business,
                   color: ThemeColors.mauve300.color,

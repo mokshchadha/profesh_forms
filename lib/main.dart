@@ -114,7 +114,6 @@ class JobApplicationApp extends StatelessWidget {
           ),
         ),
 
-        // Modern app bar theme
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -127,7 +126,6 @@ class JobApplicationApp extends StatelessWidget {
           iconTheme: IconThemeData(color: ThemeColors.mauve300.color),
         ),
 
-        // Enhanced elevated button theme
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             elevation: 8,
@@ -139,7 +137,6 @@ class JobApplicationApp extends StatelessWidget {
           ),
         ),
 
-        // Modern outlined button theme
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
             side: BorderSide(color: ThemeColors.mauve300.color, width: 2),
@@ -150,7 +147,6 @@ class JobApplicationApp extends StatelessWidget {
           ),
         ),
 
-        // Input decoration theme with modern styling
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: ThemeColors.slateGreen900.color.withValues(alpha: 0.3),
@@ -191,27 +187,11 @@ class JobApplicationApp extends StatelessWidget {
           ),
           hintStyle: TextStyle(color: ThemeColors.neutral3.color, fontSize: 16),
         ),
-
-        // Card theme for modern containers
-        // cardTheme: CardTheme(
-        //   elevation: 8,
-        //   shadowColor: ThemeColors.black.color.withValues(alpha: 0.3),
-        //   shape: RoundedRectangleBorder(
-        //     borderRadius: BorderRadius.circular(20),
-        //   ),
-        //   color: ThemeColors.slateGreen900.color.withValues(alpha: 0.3),
-        // ),
-
-        // Icon theme
         iconTheme: IconThemeData(color: ThemeColors.mauve300.color),
-
-        // Divider theme
         dividerTheme: DividerThemeData(
           color: ThemeColors.neutral4.color.withValues(alpha: 0.3),
           thickness: 1,
         ),
-
-        // Snackbar theme for error messages
         snackBarTheme: SnackBarThemeData(
           backgroundColor: ThemeColors.slateGreen900.color,
           contentTextStyle: TextStyle(
@@ -224,8 +204,6 @@ class JobApplicationApp extends StatelessWidget {
           ),
           behavior: SnackBarBehavior.floating,
         ),
-
-        // Progress indicator theme
         progressIndicatorTheme: ProgressIndicatorThemeData(
           color: ThemeColors.lime500.color,
           linearTrackColor: ThemeColors.neutral4.color.withValues(alpha: 0.3),

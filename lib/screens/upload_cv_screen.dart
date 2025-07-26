@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:profesh_forms/constants.dart';
-import 'package:profesh_forms/screens/upload_video_screen.dart'; // Add this import
+import 'package:profesh_forms/screens/upload_video_screen.dart';
 import '../services/api_service.dart';
 
 class UploadCVScreen extends StatefulWidget {
@@ -100,8 +100,6 @@ class _UploadCVScreenState extends State<UploadCVScreen>
     });
 
     _uploadController.repeat();
-
-    // Simulate upload progress
     for (int i = 0; i <= 100; i += 5) {
       await Future.delayed(const Duration(milliseconds: 200));
       if (mounted) {
@@ -128,7 +126,6 @@ class _UploadCVScreenState extends State<UploadCVScreen>
         });
 
         if (response['success'] == true) {
-          // Navigate to video upload screen after successful CV upload
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -167,7 +164,6 @@ class _UploadCVScreenState extends State<UploadCVScreen>
   }
 
   Future<void> _skipToVideo() async {
-    // Navigate to video upload screen when skipping CV
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -679,7 +675,7 @@ class _UploadCVScreenState extends State<UploadCVScreen>
             width: double.infinity,
             height: 60,
             child: OutlinedButton(
-              onPressed: _isUploading ? null : _skipToVideo, // Changed this line
+              onPressed: _isUploading ? null : _skipToVideo, 
               style: OutlinedButton.styleFrom(
                 side: BorderSide(
                   color: ThemeColors.mauve300.color, 

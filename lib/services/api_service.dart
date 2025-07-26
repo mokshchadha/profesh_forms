@@ -10,8 +10,6 @@ import 'package:profesh_forms/services/local_storage.dart';
 
 class ApiService {
   final _client = http.Client();
-
-  // Dummy method for getting job details
   Future<dynamic> getJobDetails(String jobId) async {
     // Simulate network delay
     await Future.delayed(const Duration(seconds: 2));
@@ -26,13 +24,8 @@ class ApiService {
       'logo': 'https://example.com/logo.png'
     };
   }
-
-  // Dummy method for checking application status
   Future<dynamic> checkApplicationStatus(String jobId, String email, String phone) async {
-    // Simulate network delay
     await Future.delayed(const Duration(seconds: 1));
-    
-    // Randomly return already applied or not (for demo purposes)
     final alreadyApplied = DateTime.now().millisecond % 3 == 0;
     
     return {
@@ -43,10 +36,7 @@ class ApiService {
           : 'You can proceed with the application'
     };
   }
-
-  // Dummy method for uploading CV
   Future<dynamic> uploadCV(String jobId, File cvFile, Map<String, String> userData) async {
-    // Simulate network delay
     await Future.delayed(const Duration(seconds: 3));
     
     return {
@@ -55,10 +45,7 @@ class ApiService {
       'cvUrl': 'https://example.com/cv/${DateTime.now().millisecondsSinceEpoch}.pdf'
     };
   }
-
-  // Dummy method for uploading video
   Future<dynamic> uploadVideo(String jobId, File videoFile, Map<String, String> userData) async {
-    // Simulate network delay
     await Future.delayed(const Duration(seconds: 5));
     
     return {
@@ -67,8 +54,6 @@ class ApiService {
       'videoUrl': 'https://example.com/video/${DateTime.now().millisecondsSinceEpoch}.mp4'
     };
   }
-
-  // Original methods from your API service
   Future<dynamic> getRequest(String url) async {
     try {
       final headers = await addHeaders(isMultiPart: false);
@@ -175,19 +160,13 @@ class ApiService {
       final uri = Uri.parse(url);
       final request = http.MultipartRequest('POST', uri);
       request.headers.addAll(headers);
-
-      // Determine the MIME type of the file
       final mimeType = lookupMimeType(file!.path);
       if (mimeType == null) {
         debugPrint('Err Could not determine the MIME type.');
         return;
       }
-
-      // Extract the type and subtype from the MIME type
       final mimeTypeParts = mimeType.split('/');
       final mediaType = MediaType(mimeTypeParts[0], mimeTypeParts[1]);
-
-      // Add the file to the request with the determined MIME type
       request.files.add(await http.MultipartFile.fromPath(
         fileType,
         file!.path,

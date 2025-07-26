@@ -99,8 +99,6 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
     });
 
     _uploadController.repeat();
-
-    // Simulate upload progress
     for (int i = 0; i <= 100; i += 4) {
       await Future.delayed(const Duration(milliseconds: 150));
       if (mounted) {
@@ -204,21 +202,15 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
             opacity: _fadeAnimation,
             child: Column(
               children: [
-                // Fixed header
                 Padding(
                   padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
                   child: _buildHeader(),
                 ),
-                
-                // Progress indicator
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: isMobile ? 16.0 : 24.0),
                   child: _buildProgressIndicator(),
                 ),
-                
                 SizedBox(height: isMobile ? 16 : 24),
-                
-                // Scrollable content area
                 Expanded(
                   child: SingleChildScrollView(
                     padding: EdgeInsets.symmetric(horizontal: isMobile ? 16.0 : 24.0),
@@ -233,8 +225,6 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
                     ),
                   ),
                 ),
-                
-                // Fixed action buttons at bottom
                 Container(
                   padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
                   child: _buildActionButtons(),

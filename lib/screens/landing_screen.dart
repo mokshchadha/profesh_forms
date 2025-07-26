@@ -72,12 +72,17 @@ class _LandingScreenState extends State<LandingScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        width: double.infinity, // Fix for desktop - ensures full width
+        height: double.infinity, // Fix for desktop - ensures full height
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            stops: const [0.0, 0.3, 0.7, 1.0],
             colors: [
               ThemeColors.slateGreen900.color,
+              ThemeColors.slateGreen700.color,
+              ThemeColors.mauve900.color,
               ThemeColors.black.color,
             ],
           ),
@@ -94,16 +99,28 @@ class _LandingScreenState extends State<LandingScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
-            color: ThemeColors.lime.color,
-            strokeWidth: 3,
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: ThemeColors.mauve100.color.withOpacity(0.1),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: ThemeColors.mauve300.color,
+                width: 2,
+              ),
+            ),
+            child: CircularProgressIndicator(
+              color: ThemeColors.mauve300.color,
+              strokeWidth: 3,
+            ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 30),
           Text(
             'Loading job details...',
             style: TextStyle(
-              color: ThemeColors.neutral2.color,
+              color: ThemeColors.mauve100.color,
               fontSize: 16,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -112,23 +129,40 @@ class _LandingScreenState extends State<LandingScreen>
   }
 
   Widget _buildJobContent() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 1200;
+    final isTablet = screenWidth > 600 && screenWidth <= 1200;
+    final isMobile = screenWidth <= 600;
+
     return SafeArea(
-      child: SingleChildScrollView(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: SlideTransition(
-            position: _slideAnimation,
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(),
-                  const SizedBox(height: 40),
-                  _buildJobCard(),
-                  const SizedBox(height: 40),
-                  _buildApplyButton(),
-                ],
+      child: Center( // Center content on desktop
+        child: Container(
+          width: isDesktop 
+              ? 800 // Max width for desktop
+              : double.infinity,
+          child: SingleChildScrollView(
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: Padding(
+                  padding: EdgeInsets.all(
+                    isMobile ? 16.0 : 24.0, // Smaller padding on mobile
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeader(),
+                      SizedBox(height: isMobile ? 24 : 40),
+                      _buildJobCard(),
+                      SizedBox(height: isMobile ? 24 : 40),
+                      // _buildFeaturesList(),
+                      // SizedBox(height: isMobile ? 24 : 40),
+                      _buildApplyButton(),
+                      if (isDesktop) const SizedBox(height: 40), // Extra space on desktop
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -138,151 +172,318 @@ class _LandingScreenState extends State<LandingScreen>
   }
 
   Widget _buildHeader() {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: ThemeColors.lime.color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            Icons.work_outline,
-            color: ThemeColors.lime.color,
-            size: 24,
-          ),
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth <= 600;
+
+    return Container(
+      padding: EdgeInsets.all(isMobile ? 16 : 20),
+      decoration: BoxDecoration(
+        color: ThemeColors.slateGreen100.color.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: ThemeColors.slateGreen200.color.withOpacity(0.3),
+          width: 1,
         ),
-        const SizedBox(width: 16),
-        Text(
-          'Job Opportunity',
-          style: TextStyle(
-            color: ThemeColors.lime.color,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(isMobile ? 12 : 16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  ThemeColors.mauve300.color,
+                  ThemeColors.mauve500.color,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: ThemeColors.mauve300.color.withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Icon(
+              Icons.work_outline,
+              color: ThemeColors.neutral1.color,
+              size: isMobile ? 24 : 28,
+            ),
           ),
-        ),
-      ],
+          SizedBox(width: isMobile ? 16 : 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Job Opportunity',
+                  style: TextStyle(
+                    color: ThemeColors.mauve100.color,
+                    fontSize: isMobile ? 22 : 26,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Find your perfect role',
+                  style: TextStyle(
+                    color: ThemeColors.slateGreen200.color,
+                    fontSize: isMobile ? 12 : 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildJobCard() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth <= 600;
+
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(isMobile ? 20 : 28),
       decoration: BoxDecoration(
-        color: ThemeColors.slateGreen.color.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            ThemeColors.neutral1.color.withOpacity(0.08),
+            ThemeColors.slateGreen100.color.withOpacity(0.05),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: ThemeColors.lime.color.withOpacity(0.2),
+          color: ThemeColors.slateGreen200.color.withOpacity(0.2),
           width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: ThemeColors.black.color.withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundColor: ThemeColors.lime.color,
-                child: Text(
-                  jobData?['company']?[0] ?? 'C',
-                  style: TextStyle(
-                    color: ThemeColors.black.color,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+              Container(
+                width: isMobile ? 56 : 64,
+                height: isMobile ? 56 : 64,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      ThemeColors.lime200.color,
+                      ThemeColors.lime500.color,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: ThemeColors.lime500.color.withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    jobData?['company']?[0] ?? 'C',
+                    style: TextStyle(
+                      color: ThemeColors.slateGreen900.color,
+                      fontSize: isMobile ? 20 : 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: isMobile ? 16 : 20),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       jobData?['title'] ?? 'Software Engineer',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
+                      style: TextStyle(
+                        color: ThemeColors.neutral1.color,
+                        fontSize: isMobile ? 18 : 22,
                         fontWeight: FontWeight.bold,
+                        height: 1.2,
                       ),
+                      maxLines: 2, // Prevent overflow on mobile
+                      overflow: TextOverflow.ellipsis,
                     ),
+                    const SizedBox(height: 6),
                     Text(
                       jobData?['company'] ?? 'Tech Company',
                       style: TextStyle(
-                        color: ThemeColors.neutral3.color,
-                        fontSize: 16,
+                        color: ThemeColors.mauve300.color,
+                        fontSize: isMobile ? 14 : 16,
+                        fontWeight: FontWeight.w600,
                       ),
+                      maxLines: 1, // Prevent overflow on mobile
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          Text(
-            'Job Description',
-            style: TextStyle(
-              color: ThemeColors.lime.color,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+          SizedBox(height: isMobile ? 20 : 24),
+          Container(
+            padding: EdgeInsets.all(isMobile ? 14 : 16),
+            decoration: BoxDecoration(
+              color: ThemeColors.slateGreen900.color.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: ThemeColors.slateGreen200.color.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Job Description',
+                  style: TextStyle(
+                    color: ThemeColors.lime200.color,
+                    fontSize: isMobile ? 16 : 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: isMobile ? 10 : 12),
+                Text(
+                  jobData?['description'] ?? 
+                  'We are looking for a talented developer to join our team. This is an exciting opportunity to work on cutting-edge projects and grow your career.',
+                  style: TextStyle(
+                    color: ThemeColors.neutral2.color,
+                    fontSize: isMobile ? 14 : 16,
+                    height: 1.6,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
-          Text(
-            jobData?['description'] ?? 
-            'We are looking for a talented developer to join our team. This is an exciting opportunity to work on cutting-edge projects and grow your career.',
-            style: TextStyle(
-              color: ThemeColors.neutral2.color,
-              fontSize: 16,
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              _buildInfoChip(Icons.location_on, jobData?['location'] ?? 'Remote'),
-              const SizedBox(width: 12),
-              _buildInfoChip(Icons.access_time, jobData?['type'] ?? 'Full-time'),
-            ],
-          ),
+          SizedBox(height: isMobile ? 16 : 20),
+          // Fix for mobile overflow - make chips wrap or stack
+          isMobile 
+              ? Column( // Stack chips vertically on mobile
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildInfoChip(
+                      Icons.location_on, 
+                      jobData?['location'] ?? 'Remote',
+                      ThemeColors.mauve300.color,
+                      ThemeColors.mauve100.color,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildInfoChip(
+                      Icons.access_time, 
+                      jobData?['type'] ?? 'Full-time',
+                      ThemeColors.slateGreen200.color,
+                      ThemeColors.slateGreen100.color,
+                    ),
+                  ],
+                )
+              : Wrap( // Use Wrap for desktop/tablet to handle overflow
+                  spacing: 12,
+                  runSpacing: 8,
+                  children: [
+                    _buildInfoChip(
+                      Icons.location_on, 
+                      jobData?['location'] ?? 'Remote',
+                      ThemeColors.mauve300.color,
+                      ThemeColors.mauve100.color,
+                    ),
+                    _buildInfoChip(
+                      Icons.access_time, 
+                      jobData?['type'] ?? 'Full-time',
+                      ThemeColors.slateGreen200.color,
+                      ThemeColors.slateGreen100.color,
+                    ),
+                  ],
+                ),
         ],
       ),
     );
   }
 
-  Widget _buildInfoChip(IconData icon, String text) {
+  Widget _buildInfoChip(IconData icon, String text, Color borderColor, Color bgColor) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth <= 600;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 12 : 16, 
+        vertical: isMobile ? 6 : 8,
+      ),
       decoration: BoxDecoration(
-        color: ThemeColors.lime.color.withOpacity(0.1),
+        color: bgColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: borderColor.withOpacity(0.3),
+          width: 1,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             icon,
-            color: ThemeColors.lime.color,
-            size: 16,
+            color: borderColor,
+            size: isMobile ? 14 : 16,
           ),
-          const SizedBox(width: 4),
-          Text(
-            text,
-            style: TextStyle(
-              color: ThemeColors.lime.color,
-              fontSize: 14,
+          SizedBox(width: isMobile ? 4 : 6),
+          Flexible( // Allow text to wrap if needed
+            child: Text(
+              text,
+              style: TextStyle(
+                color: borderColor,
+                fontSize: isMobile ? 12 : 14,
+                fontWeight: FontWeight.w600,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
       ),
     );
   }
-
+ 
   Widget _buildApplyButton() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth <= 600;
+    final isDesktop = screenWidth > 1200;
+
     return Center(
-      child: SizedBox(
-        width: double.infinity,
-        height: 56,
+      child: Container(
+        width: isDesktop ? 280 : double.infinity, // Smaller width on desktop
+        height: isMobile ? 56 : 60,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              ThemeColors.lime200.color,
+              ThemeColors.lime500.color,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: ThemeColors.lime500.color.withOpacity(0.4),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
         child: ElevatedButton(
           onPressed: () {
             Navigator.push(
@@ -293,27 +494,29 @@ class _LandingScreenState extends State<LandingScreen>
             );
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: ThemeColors.lime.color,
-            foregroundColor: ThemeColors.black.color,
-            elevation: 8,
-            shadowColor: ThemeColors.lime.color.withOpacity(0.3),
+            backgroundColor: Colors.transparent,
+            foregroundColor: ThemeColors.slateGreen900.color,
+            elevation: 0,
+            shadowColor: Colors.transparent,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
             ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.send,
-                size: 24,
+              Icon(
+                Icons.send_rounded,
+                size: isMobile ? 20 : 24,
+                color: ThemeColors.slateGreen900.color,
               ),
-              const SizedBox(width: 12),
-              const Text(
+              SizedBox(width: isMobile ? 8 : 12),
+              Text(
                 'Apply Now',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: isMobile ? 16 : 18,
                   fontWeight: FontWeight.bold,
+                  color: ThemeColors.slateGreen900.color,
                 ),
               ),
             ],

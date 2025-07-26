@@ -22,9 +22,11 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
     with TickerProviderStateMixin {
   late AnimationController _animationController;
   late AnimationController _pulseController;
+  late AnimationController _confettiController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _pulseAnimation;
+  late Animation<double> _slideAnimation;
 
   @override
   void initState() {
@@ -38,6 +40,11 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
       duration: const Duration(milliseconds: 2000),
       vsync: this,
     );
+
+    _confettiController = AnimationController(
+      duration: const Duration(milliseconds: 3000),
+      vsync: this,
+    );
     
     _fadeAnimation = Tween<double>(
       begin: 0.0,
@@ -48,29 +55,41 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
     ));
     
     _scaleAnimation = Tween<double>(
-      begin: 0.5,
+      begin: 0.3,
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.elasticOut,
     ));
+
+    _slideAnimation = Tween<double>(
+      begin: 50.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutCubic,
+    ));
     
     _pulseAnimation = Tween<double>(
       begin: 1.0,
-      end: 1.1,
+      end: 1.05,
     ).animate(CurvedAnimation(
       parent: _pulseController,
       curve: Curves.easeInOut,
     ));
     
     _animationController.forward();
-    _pulseController.repeat(reverse: true);
+    if (widget.showDownloadButton) {
+      _pulseController.repeat(reverse: true);
+      _confettiController.forward();
+    }
   }
 
   @override
   void dispose() {
     _animationController.dispose();
     _pulseController.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 
@@ -87,10 +106,13 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            stops: const [0.0, 0.3, 0.7, 1.0],
             colors: [
               ThemeColors.slateGreen900.color,
+              ThemeColors.slateGreen700.color,
+              ThemeColors.mauve900.color,
               ThemeColors.black.color,
             ],
           ),
@@ -103,15 +125,22 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  _buildFloatingElements(),
                   ScaleTransition(
                     scale: _scaleAnimation,
                     child: _buildSuccessIcon(),
                   ),
                   const SizedBox(height: 40),
-                  _buildTitle(),
-                  const SizedBox(height: 20),
-                  _buildMessage(),
-                  const SizedBox(height: 60),
+                  AnimatedBuilder(
+                    animation: _slideAnimation,
+                    builder: (context, child) {
+                      return Transform.translate(
+                        offset: Offset(0, _slideAnimation.value),
+                        child: _buildContentCard(),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 40),
                   if (widget.showDownloadButton) _buildDownloadButton(),
                   const SizedBox(height: 20),
                   _buildHomeButton(),
@@ -124,77 +153,243 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
     );
   }
 
+  Widget _buildFloatingElements() {
+    if (!widget.showDownloadButton) return const SizedBox.shrink();
+    
+    return AnimatedBuilder(
+      animation: _confettiController,
+      builder: (context, child) {
+        return Stack(
+          children: List.generate(6, (index) {
+            final offset = Offset(
+              (index * 60.0) - 150,
+              -100 + (_confettiController.value * 200),
+            );
+            return Positioned(
+              left: MediaQuery.of(context).size.width / 2 + offset.dx,
+              top: 100 + offset.dy,
+              child: Transform.rotate(
+                angle: _confettiController.value * 6.28 * (index + 1),
+                child: Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: [
+                      ThemeColors.lime500.color,
+                      ThemeColors.mauve300.color,
+                      ThemeColors.slateGreen200.color,
+                    ][index % 3],
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            );
+          }),
+        );
+      },
+    );
+  }
+
   Widget _buildSuccessIcon() {
     return Container(
-      width: 120,
-      height: 120,
+      width: 140,
+      height: 140,
       decoration: BoxDecoration(
-        color: ThemeColors.lime.color.withOpacity(0.2),
+        gradient: RadialGradient(
+          colors: [
+            ThemeColors.lime200.color.withOpacity(0.3),
+            ThemeColors.lime500.color.withOpacity(0.1),
+            Colors.transparent,
+          ],
+        ),
         shape: BoxShape.circle,
-        border: Border.all(
-          color: ThemeColors.lime.color,
-          width: 3,
+      ),
+      child: Container(
+        margin: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              ThemeColors.lime200.color,
+              ThemeColors.lime500.color,
+            ],
+          ),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: ThemeColors.lime500.color.withOpacity(0.5),
+              blurRadius: 30,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Icon(
+          widget.showDownloadButton ? Icons.check_circle_rounded : Icons.info_rounded,
+          size: 60,
+          color: ThemeColors.slateGreen900.color,
         ),
       ),
-      child: Icon(
-        widget.showDownloadButton ? Icons.check_circle : Icons.info,
-        size: 60,
-        color: ThemeColors.lime.color,
+    );
+  }
+
+  Widget _buildContentCard() {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            ThemeColors.neutral1.color.withOpacity(0.08),
+            ThemeColors.slateGreen100.color.withOpacity(0.05),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: ThemeColors.slateGreen200.color.withOpacity(0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: ThemeColors.black.color.withOpacity(0.3),
+            blurRadius: 30,
+            offset: const Offset(0, 15),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            widget.title,
+            style: TextStyle(
+              color: ThemeColors.neutral1.color,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              height: 1.2,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: ThemeColors.slateGreen900.color.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: ThemeColors.slateGreen200.color.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+            child: Text(
+              widget.message,
+              style: TextStyle(
+                color: ThemeColors.neutral2.color,
+                fontSize: 18,
+                height: 1.6,
+                fontWeight: FontWeight.w400,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          if (widget.showDownloadButton) ...[
+            const SizedBox(height: 24),
+            _buildSuccessFeatures(),
+          ],
+        ],
       ),
     );
   }
 
-  Widget _buildTitle() {
-    return Text(
-      widget.title,
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 28,
-        fontWeight: FontWeight.bold,
-      ),
-      textAlign: TextAlign.center,
-    );
-  }
+  Widget _buildSuccessFeatures() {
+    final features = [
+      {'icon': Icons.notifications_active, 'text': 'You\'ll receive updates via email'},
+      {'icon': Icons.speed, 'text': 'Fast-track review process'},
+      {'icon': Icons.mobile_friendly, 'text': 'Download our app for more opportunities'},
+    ];
 
-  Widget _buildMessage() {
-    return Text(
-      widget.message,
-      style: TextStyle(
-        color: ThemeColors.neutral2.color,
-        fontSize: 18,
-        height: 1.5,
-      ),
-      textAlign: TextAlign.center,
+    return Column(
+      children: features.map((feature) => Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: ThemeColors.mauve300.color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: ThemeColors.mauve300.color.withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              feature['icon'] as IconData,
+              color: ThemeColors.mauve300.color,
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                feature['text'] as String,
+                style: TextStyle(
+                  color: ThemeColors.neutral2.color,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+      )).toList(),
     );
   }
 
   Widget _buildDownloadButton() {
     return ScaleTransition(
       scale: _pulseAnimation,
-      child: SizedBox(
+      child: Container(
         width: double.infinity,
-        height: 56,
+        height: 60,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              ThemeColors.lime200.color,
+              ThemeColors.lime500.color,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: ThemeColors.lime500.color.withOpacity(0.4),
+              blurRadius: 25,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
         child: ElevatedButton(
           onPressed: _launchProfeshApp,
           style: ElevatedButton.styleFrom(
-            backgroundColor: ThemeColors.lime.color,
-            foregroundColor: ThemeColors.black.color,
-            elevation: 8,
-            shadowColor: ThemeColors.lime.color.withOpacity(0.3),
+            backgroundColor: Colors.transparent,
+            foregroundColor: ThemeColors.slateGreen900.color,
+            elevation: 0,
+            shadowColor: Colors.transparent,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
             ),
           ),
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.download, size: 24),
-              SizedBox(width: 12),
+              Icon(
+                Icons.download_rounded,
+                size: 24,
+                color: ThemeColors.slateGreen900.color,
+              ),
+              const SizedBox(width: 12),
               Text(
                 'Download Profesh App',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: ThemeColors.slateGreen900.color,
                 ),
               ),
             ],
@@ -205,30 +400,49 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
   }
 
   Widget _buildHomeButton() {
-    return SizedBox(
+    return Container(
       width: double.infinity,
-      height: 56,
+      height: 60,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: ThemeColors.mauve300.color,
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: ThemeColors.mauve300.color.withOpacity(0.2),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
       child: OutlinedButton(
         onPressed: () {
           Navigator.popUntil(context, (route) => route.isFirst);
         },
         style: OutlinedButton.styleFrom(
-          side: BorderSide(color: ThemeColors.lime.color, width: 2),
+          side: BorderSide.none,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
+          backgroundColor: ThemeColors.mauve300.color.withOpacity(0.05),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.home, color: ThemeColors.lime.color, size: 24),
+            Icon(
+              Icons.home_rounded,
+              color: ThemeColors.mauve300.color,
+              size: 24,
+            ),
             const SizedBox(width: 12),
             Text(
               'Back to Home',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: ThemeColors.lime.color,
+                color: ThemeColors.mauve300.color,
               ),
             ),
           ],

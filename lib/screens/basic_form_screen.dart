@@ -167,10 +167,10 @@ class _BasicFormScreenState extends State<BasicFormScreen>
       children: [
         Container(
           decoration: BoxDecoration(
-            color: ThemeColors.mauve300.color.withOpacity(0.2),
+            color: ThemeColors.mauve300.color.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: ThemeColors.mauve300.color.withOpacity(0.3),
+              color: ThemeColors.mauve300.color.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
@@ -214,10 +214,10 @@ class _BasicFormScreenState extends State<BasicFormScreen>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: ThemeColors.slateGreen100.color.withOpacity(0.05),
+        color: ThemeColors.slateGreen100.color.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: ThemeColors.slateGreen200.color.withOpacity(0.2),
+          color: ThemeColors.slateGreen200.color.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -242,7 +242,7 @@ class _BasicFormScreenState extends State<BasicFormScreen>
           decoration: BoxDecoration(
             color: active 
                 ? ThemeColors.lime500.color 
-                : ThemeColors.neutral4.color.withOpacity(0.3),
+                : ThemeColors.neutral4.color.withValues(alpha: 0.3),
             shape: BoxShape.circle,
             border: Border.all(
               color: active 
@@ -287,7 +287,7 @@ class _BasicFormScreenState extends State<BasicFormScreen>
         decoration: BoxDecoration(
           color: active 
               ? ThemeColors.lime500.color 
-              : ThemeColors.neutral4.color.withOpacity(0.3),
+              : ThemeColors.neutral4.color.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(1),
         ),
       ),
@@ -302,18 +302,18 @@ class _BasicFormScreenState extends State<BasicFormScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            ThemeColors.neutral1.color.withOpacity(0.08),
-            ThemeColors.slateGreen100.color.withOpacity(0.05),
+            ThemeColors.neutral1.color.withValues(alpha: 0.08),
+            ThemeColors.slateGreen100.color.withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: ThemeColors.slateGreen200.color.withOpacity(0.2),
+          color: ThemeColors.slateGreen200.color.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: ThemeColors.black.color.withOpacity(0.3),
+            color: ThemeColors.black.color.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -417,7 +417,7 @@ class _BasicFormScreenState extends State<BasicFormScreen>
               margin: const EdgeInsets.all(12),
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: ThemeColors.mauve300.color.withOpacity(0.2),
+                color: ThemeColors.mauve300.color.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -429,7 +429,7 @@ class _BasicFormScreenState extends State<BasicFormScreen>
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: ThemeColors.slateGreen200.color.withOpacity(0.3),
+                color: ThemeColors.slateGreen200.color.withValues(alpha: 0.3),
                 width: 1.5,
               ),
             ),
@@ -455,7 +455,7 @@ class _BasicFormScreenState extends State<BasicFormScreen>
               ),
             ),
             filled: true,
-            fillColor: ThemeColors.slateGreen900.color.withOpacity(0.3),
+            fillColor: ThemeColors.slateGreen900.color.withValues(alpha: 0.3),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16, 
               vertical: 16,
@@ -485,7 +485,7 @@ class _BasicFormScreenState extends State<BasicFormScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: ThemeColors.lime500.color.withOpacity(0.4),
+            color: ThemeColors.lime500.color.withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),

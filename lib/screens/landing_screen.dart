@@ -111,7 +111,7 @@ class _LandingScreenState extends State<LandingScreen>
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: ThemeColors.mauve100.color.withOpacity(0.1),
+              color: ThemeColors.mauve100.color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
               border: Border.all(
                 color: ThemeColors.mauve300.color,
@@ -185,10 +185,10 @@ class _LandingScreenState extends State<LandingScreen>
     return Container(
       padding: EdgeInsets.all(isMobile ? 16 : 20),
       decoration: BoxDecoration(
-        color: ThemeColors.slateGreen100.color.withOpacity(0.05),
+        color: ThemeColors.slateGreen100.color.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: ThemeColors.slateGreen200.color.withOpacity(0.3),
+          color: ThemeColors.slateGreen200.color.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -206,7 +206,7 @@ class _LandingScreenState extends State<LandingScreen>
               ),
               boxShadow: [
                 BoxShadow(
-                  color: ThemeColors.lime500.color.withOpacity(0.3),
+                  color: ThemeColors.lime500.color.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -282,10 +282,10 @@ class _LandingScreenState extends State<LandingScreen>
             height: isMobile ? 50 : 60,
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: ThemeColors.neutral1.color.withOpacity(0.1),
+              color: ThemeColors.neutral1.color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: ThemeColors.mauve300.color.withOpacity(0.3),
+                color: ThemeColors.mauve300.color.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -318,18 +318,18 @@ class _LandingScreenState extends State<LandingScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            ThemeColors.neutral1.color.withOpacity(0.08),
-            ThemeColors.slateGreen100.color.withOpacity(0.05),
+            ThemeColors.neutral1.color.withValues(alpha: 0.08),
+            ThemeColors.slateGreen100.color.withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: ThemeColors.slateGreen200.color.withOpacity(0.2),
+          color: ThemeColors.slateGreen200.color.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: ThemeColors.black.color.withOpacity(0.3),
+            color: ThemeColors.black.color.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -342,10 +342,10 @@ class _LandingScreenState extends State<LandingScreen>
           Container(
             padding: EdgeInsets.all(isMobile ? 14 : 16),
             decoration: BoxDecoration(
-              color: ThemeColors.slateGreen900.color.withOpacity(0.3),
+              color: ThemeColors.slateGreen900.color.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: ThemeColors.slateGreen200.color.withOpacity(0.2),
+                color: ThemeColors.slateGreen200.color.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -427,10 +427,10 @@ class _LandingScreenState extends State<LandingScreen>
         vertical: isMobile ? 6 : 8,
       ),
       decoration: BoxDecoration(
-        color: bgColor.withOpacity(0.1),
+        color: bgColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: borderColor.withOpacity(0.3),
+          color: borderColor.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -479,7 +479,7 @@ class _LandingScreenState extends State<LandingScreen>
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: ThemeColors.lime500.color.withOpacity(0.4),
+              color: ThemeColors.lime500.color.withValues(alpha: 0.4),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),

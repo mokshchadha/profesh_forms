@@ -255,10 +255,10 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
       children: [
         Container(
           decoration: BoxDecoration(
-            color: ThemeColors.mauve300.color.withOpacity(0.2),
+            color: ThemeColors.mauve300.color.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: ThemeColors.mauve300.color.withOpacity(0.3),
+              color: ThemeColors.mauve300.color.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
@@ -302,10 +302,10 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: ThemeColors.slateGreen100.color.withOpacity(0.05),
+        color: ThemeColors.slateGreen100.color.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: ThemeColors.slateGreen200.color.withOpacity(0.2),
+          color: ThemeColors.slateGreen200.color.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -332,7 +332,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
                 ? ThemeColors.lime700.color
                 : active 
                     ? ThemeColors.lime500.color 
-                    : ThemeColors.neutral4.color.withOpacity(0.3),
+                    : ThemeColors.neutral4.color.withValues(alpha: 0.3),
             shape: BoxShape.circle,
             border: Border.all(
               color: completed || active
@@ -383,7 +383,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
         decoration: BoxDecoration(
           color: active 
               ? ThemeColors.lime500.color 
-              : ThemeColors.neutral4.color.withOpacity(0.3),
+              : ThemeColors.neutral4.color.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(1),
         ),
       ),
@@ -407,15 +407,15 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              ThemeColors.neutral1.color.withOpacity(0.08),
-              ThemeColors.slateGreen100.color.withOpacity(0.05),
+              ThemeColors.neutral1.color.withValues(alpha: 0.08),
+              ThemeColors.slateGreen100.color.withValues(alpha: 0.05),
             ],
           ),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: _selectedVideo != null
                 ? ThemeColors.lime500.color
-                : ThemeColors.slateGreen200.color.withOpacity(0.3),
+                : ThemeColors.slateGreen200.color.withValues(alpha: 0.3),
             width: 2,
             style: _selectedVideo != null 
                 ? BorderStyle.solid 
@@ -423,7 +423,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
           ),
           boxShadow: [
             BoxShadow(
-              color: ThemeColors.black.color.withOpacity(0.3),
+              color: ThemeColors.black.color.withValues(alpha: 0.3),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -448,8 +448,8 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  ThemeColors.mauve300.color.withOpacity(0.2),
-                  ThemeColors.mauve500.color.withOpacity(0.1),
+                  ThemeColors.mauve300.color.withValues(alpha: 0.2),
+                  ThemeColors.mauve500.color.withValues(alpha: 0.1),
                 ],
               ),
               shape: BoxShape.circle,
@@ -497,10 +497,10 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
               vertical: isMobile ? 10 : 12,
             ),
             decoration: BoxDecoration(
-              color: ThemeColors.lime500.color.withOpacity(0.1),
+              color: ThemeColors.lime500.color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: ThemeColors.lime500.color.withOpacity(0.3),
+                color: ThemeColors.lime500.color.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -528,7 +528,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
           Container(
             padding: EdgeInsets.all(isMobile ? 20 : 24),
             decoration: BoxDecoration(
-              color: ThemeColors.lime500.color.withOpacity(0.1),
+              color: ThemeColors.lime500.color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
               border: Border.all(
                 color: ThemeColors.lime500.color,
@@ -554,10 +554,10 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
           Container(
             padding: EdgeInsets.all(isMobile ? 12 : 16),
             decoration: BoxDecoration(
-              color: ThemeColors.slateGreen900.color.withOpacity(0.3),
+              color: ThemeColors.slateGreen900.color.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: ThemeColors.slateGreen200.color.withOpacity(0.2),
+                color: ThemeColors.slateGreen200.color.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -604,10 +604,10 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
       width: double.infinity,
       padding: EdgeInsets.all(isMobile ? 16 : 20),
       decoration: BoxDecoration(
-        color: ThemeColors.slateGreen900.color.withOpacity(0.3),
+        color: ThemeColors.slateGreen900.color.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: ThemeColors.slateGreen200.color.withOpacity(0.2),
+          color: ThemeColors.slateGreen200.color.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -663,7 +663,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
           child: Container(
             padding: EdgeInsets.all(isMobile ? 16 : 20),
             decoration: BoxDecoration(
-              color: ThemeColors.lime500.color.withOpacity(0.1),
+              color: ThemeColors.lime500.color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -695,7 +695,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
           width: isMobile ? 200 : 250,
           height: 8,
           decoration: BoxDecoration(
-            color: ThemeColors.neutral4.color.withOpacity(0.3),
+            color: ThemeColors.neutral4.color.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(4),
           ),
           child: FractionallySizedBox(
@@ -748,7 +748,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: ThemeColors.lime500.color.withOpacity(0.4),
+                  color: ThemeColors.lime500.color.withValues(alpha: 0.4),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
@@ -801,7 +801,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              backgroundColor: ThemeColors.mauve300.color.withOpacity(0.05),
+              backgroundColor: ThemeColors.mauve300.color.withValues(alpha: 0.05),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

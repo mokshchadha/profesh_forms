@@ -229,10 +229,10 @@ class _UploadCVScreenState extends State<UploadCVScreen>
       children: [
         Container(
           decoration: BoxDecoration(
-            color: ThemeColors.mauve300.color.withOpacity(0.2),
+            color: ThemeColors.mauve300.color.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: ThemeColors.mauve300.color.withOpacity(0.3),
+              color: ThemeColors.mauve300.color.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
@@ -276,10 +276,10 @@ class _UploadCVScreenState extends State<UploadCVScreen>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: ThemeColors.slateGreen100.color.withOpacity(0.05),
+        color: ThemeColors.slateGreen100.color.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: ThemeColors.slateGreen200.color.withOpacity(0.2),
+          color: ThemeColors.slateGreen200.color.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -306,7 +306,7 @@ class _UploadCVScreenState extends State<UploadCVScreen>
                 ? ThemeColors.lime700.color
                 : active 
                     ? ThemeColors.lime500.color 
-                    : ThemeColors.neutral4.color.withOpacity(0.3),
+                    : ThemeColors.neutral4.color.withValues(alpha: 0.3),
             shape: BoxShape.circle,
             border: Border.all(
               color: completed || active
@@ -357,7 +357,7 @@ class _UploadCVScreenState extends State<UploadCVScreen>
         decoration: BoxDecoration(
           color: active 
               ? ThemeColors.lime500.color 
-              : ThemeColors.neutral4.color.withOpacity(0.3),
+              : ThemeColors.neutral4.color.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(1),
         ),
       ),
@@ -376,15 +376,15 @@ class _UploadCVScreenState extends State<UploadCVScreen>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                ThemeColors.neutral1.color.withOpacity(0.08),
-                ThemeColors.slateGreen100.color.withOpacity(0.05),
+                ThemeColors.neutral1.color.withValues(alpha: 0.08),
+                ThemeColors.slateGreen100.color.withValues(alpha: 0.05),
               ],
             ),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
               color: _selectedFile != null
                   ? ThemeColors.lime500.color
-                  : ThemeColors.slateGreen200.color.withOpacity(0.3),
+                  : ThemeColors.slateGreen200.color.withValues(alpha: 0.3),
               width: 2,
               style: _selectedFile != null 
                   ? BorderStyle.solid 
@@ -392,7 +392,7 @@ class _UploadCVScreenState extends State<UploadCVScreen>
             ),
             boxShadow: [
               BoxShadow(
-                color: ThemeColors.black.color.withOpacity(0.3),
+                color: ThemeColors.black.color.withValues(alpha: 0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -414,8 +414,8 @@ class _UploadCVScreenState extends State<UploadCVScreen>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  ThemeColors.mauve300.color.withOpacity(0.2),
-                  ThemeColors.mauve500.color.withOpacity(0.1),
+                  ThemeColors.mauve300.color.withValues(alpha: 0.2),
+                  ThemeColors.mauve500.color.withValues(alpha: 0.1),
                 ],
               ),
               shape: BoxShape.circle,
@@ -458,10 +458,10 @@ class _UploadCVScreenState extends State<UploadCVScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
-              color: ThemeColors.lime500.color.withOpacity(0.1),
+              color: ThemeColors.lime500.color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: ThemeColors.lime500.color.withOpacity(0.3),
+                color: ThemeColors.lime500.color.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -489,7 +489,7 @@ class _UploadCVScreenState extends State<UploadCVScreen>
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: ThemeColors.lime500.color.withOpacity(0.1),
+              color: ThemeColors.lime500.color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
               border: Border.all(
                 color: ThemeColors.lime500.color,
@@ -515,10 +515,10 @@ class _UploadCVScreenState extends State<UploadCVScreen>
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: ThemeColors.slateGreen900.color.withOpacity(0.3),
+              color: ThemeColors.slateGreen900.color.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: ThemeColors.slateGreen200.color.withOpacity(0.2),
+                color: ThemeColors.slateGreen200.color.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -560,7 +560,7 @@ class _UploadCVScreenState extends State<UploadCVScreen>
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: ThemeColors.lime500.color.withOpacity(0.1),
+              color: ThemeColors.lime500.color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -584,7 +584,7 @@ class _UploadCVScreenState extends State<UploadCVScreen>
           width: 250,
           height: 8,
           decoration: BoxDecoration(
-            color: ThemeColors.neutral4.color.withOpacity(0.3),
+            color: ThemeColors.neutral4.color.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(4),
           ),
           child: FractionallySizedBox(
@@ -635,7 +635,7 @@ class _UploadCVScreenState extends State<UploadCVScreen>
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: ThemeColors.lime500.color.withOpacity(0.4),
+                    color: ThemeColors.lime500.color.withValues(alpha: 0.4),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),

@@ -180,9 +180,9 @@ extension ThemeColorExtension on ThemeColors {
       case ThemeColors.black:
         return const Color(0xFF051011);
       case ThemeColors.neon:
-        return const Color.fromARGB(255, 57, 255, 20).withOpacity(0.5);
+        return const Color.fromARGB(255, 57, 255, 20).withValues(alpha: 0.5);
       case ThemeColors.red:
-        return const Color.fromARGB(255, 255, 20, 20).withOpacity(0.5);
+        return const Color.fromARGB(255, 255, 20, 20).withValues(alpha: 0.5);
       case ThemeColors.amber:
         return const Color.fromARGB(255, 229, 167, 10);
       case ThemeColors.lightgrey:

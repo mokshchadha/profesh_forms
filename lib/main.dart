@@ -138,7 +138,7 @@ class JobApplicationApp extends StatelessWidget {
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             elevation: 8,
-            shadowColor: ThemeColors.lime500.color.withOpacity(0.3),
+            shadowColor: ThemeColors.lime500.color.withValues(alpha: 0.3),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
@@ -163,19 +163,19 @@ class JobApplicationApp extends StatelessWidget {
         // Input decoration theme with modern styling
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: ThemeColors.slateGreen900.color.withOpacity(0.3),
+          fillColor: ThemeColors.slateGreen900.color.withValues(alpha: 0.3),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
-              color: ThemeColors.slateGreen200.color.withOpacity(0.3),
+              color: ThemeColors.slateGreen200.color.withValues(alpha: 0.3),
               width: 1.5,
             ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
-              color: ThemeColors.slateGreen200.color.withOpacity(0.3),
+              color: ThemeColors.slateGreen200.color.withValues(alpha: 0.3),
               width: 1.5,
             ),
           ),
@@ -214,11 +214,11 @@ class JobApplicationApp extends StatelessWidget {
         // Card theme for modern containers
         // cardTheme: CardTheme(
         //   elevation: 8,
-        //   shadowColor: ThemeColors.black.color.withOpacity(0.3),
+        //   shadowColor: ThemeColors.black.color.withValues(alpha: 0.3),
         //   shape: RoundedRectangleBorder(
         //     borderRadius: BorderRadius.circular(20),
         //   ),
-        //   color: ThemeColors.slateGreen900.color.withOpacity(0.3),
+        //   color: ThemeColors.slateGreen900.color.withValues(alpha: 0.3),
         // ),
         
         // Icon theme
@@ -228,7 +228,7 @@ class JobApplicationApp extends StatelessWidget {
         
         // Divider theme
         dividerTheme: DividerThemeData(
-          color: ThemeColors.neutral4.color.withOpacity(0.3),
+          color: ThemeColors.neutral4.color.withValues(alpha: 0.3),
           thickness: 1,
         ),
         
@@ -249,8 +249,8 @@ class JobApplicationApp extends StatelessWidget {
         // Progress indicator theme
         progressIndicatorTheme: ProgressIndicatorThemeData(
           color: ThemeColors.lime500.color,
-          linearTrackColor: ThemeColors.neutral4.color.withOpacity(0.3),
-          circularTrackColor: ThemeColors.neutral4.color.withOpacity(0.3),
+          linearTrackColor: ThemeColors.neutral4.color.withValues(alpha: 0.3),
+          circularTrackColor: ThemeColors.neutral4.color.withValues(alpha: 0.3),
         ),
       ),
       home: const LandingScreen(),

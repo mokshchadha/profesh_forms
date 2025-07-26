@@ -197,8 +197,8 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
       decoration: BoxDecoration(
         gradient: RadialGradient(
           colors: [
-            ThemeColors.lime200.color.withOpacity(0.3),
-            ThemeColors.lime500.color.withOpacity(0.1),
+            ThemeColors.lime200.color.withValues(alpha: 0.3),
+            ThemeColors.lime500.color.withValues(alpha: 0.1),
             Colors.transparent,
           ],
         ),
@@ -216,7 +216,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: ThemeColors.lime500.color.withOpacity(0.5),
+              color: ThemeColors.lime500.color.withValues(alpha: 0.5),
               blurRadius: 30,
               offset: const Offset(0, 10),
             ),
@@ -239,18 +239,18 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            ThemeColors.neutral1.color.withOpacity(0.08),
-            ThemeColors.slateGreen100.color.withOpacity(0.05),
+            ThemeColors.neutral1.color.withValues(alpha: 0.08),
+            ThemeColors.slateGreen100.color.withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: ThemeColors.slateGreen200.color.withOpacity(0.2),
+          color: ThemeColors.slateGreen200.color.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: ThemeColors.black.color.withOpacity(0.3),
+            color: ThemeColors.black.color.withValues(alpha: 0.3),
             blurRadius: 30,
             offset: const Offset(0, 15),
           ),
@@ -272,10 +272,10 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: ThemeColors.slateGreen900.color.withOpacity(0.3),
+              color: ThemeColors.slateGreen900.color.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: ThemeColors.slateGreen200.color.withOpacity(0.2),
+                color: ThemeColors.slateGreen200.color.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -311,10 +311,10 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: ThemeColors.mauve300.color.withOpacity(0.1),
+          color: ThemeColors.mauve300.color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: ThemeColors.mauve300.color.withOpacity(0.2),
+            color: ThemeColors.mauve300.color.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -358,7 +358,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: ThemeColors.lime500.color.withOpacity(0.4),
+              color: ThemeColors.lime500.color.withValues(alpha: 0.4),
               blurRadius: 25,
               offset: const Offset(0, 10),
             ),
@@ -411,7 +411,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: ThemeColors.mauve300.color.withOpacity(0.2),
+            color: ThemeColors.mauve300.color.withValues(alpha: 0.2),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -426,7 +426,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          backgroundColor: ThemeColors.mauve300.color.withOpacity(0.05),
+          backgroundColor: ThemeColors.mauve300.color.withValues(alpha: 0.05),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

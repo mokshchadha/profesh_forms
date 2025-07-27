@@ -96,8 +96,8 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
       context,
       MaterialPageRoute(
         builder: (context) => VideoRecorderScreen(
-          jobId: widget.jobId,
-          userData: widget.userData,
+          // jobId: widget.jobId,
+          // userData: widget.userData,
         ),
       ),
     );

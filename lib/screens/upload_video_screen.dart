@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:profesh_forms/constants.dart';
 import 'package:profesh_forms/screens/already_applied_screen.dart';
+import 'package:profesh_forms/screens/video_recorder_screen.dart';
 import '../services/api_service.dart';
 
 class UploadVideoScreen extends StatefulWidget {
@@ -86,6 +87,24 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
     if (result != null) {
       setState(() {
         _selectedVideo = File(result.files.single.path!);
+      });
+    }
+  }
+
+  Future<void> _recordVideo() async {
+    final result = await Navigator.push<File>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VideoRecorderScreen(
+          jobId: widget.jobId,
+          userData: widget.userData,
+        ),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedVideo = result;
       });
     }
   }
@@ -384,43 +403,40 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 600;
     
-    return GestureDetector(
-      onTap: _isUploading ? null : _pickVideo,
-      child: Container(
-        width: double.infinity,
-        constraints: BoxConstraints(
-          minHeight: isMobile ? 400 : 500,
-        ),
-        padding: EdgeInsets.all(isMobile ? 20 : 32),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              ThemeColors.neutral1.color.withValues(alpha: 0.08),
-              ThemeColors.slateGreen100.color.withValues(alpha: 0.05),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: _selectedVideo != null
-                ? ThemeColors.lime500.color
-                : ThemeColors.slateGreen200.color.withValues(alpha: 0.3),
-            width: 2,
-            style: _selectedVideo != null 
-                ? BorderStyle.solid 
-                : BorderStyle.none,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: ThemeColors.black.color.withValues(alpha: 0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
+    return Container(
+      width: double.infinity,
+      constraints: BoxConstraints(
+        minHeight: isMobile ? 400 : 500,
+      ),
+      padding: EdgeInsets.all(isMobile ? 20 : 32),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            ThemeColors.neutral1.color.withValues(alpha: 0.08),
+            ThemeColors.slateGreen100.color.withValues(alpha: 0.05),
           ],
         ),
-        child: _isUploading ? _buildUploadProgress() : _buildUploadContent(),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: _selectedVideo != null
+              ? ThemeColors.lime500.color
+              : ThemeColors.slateGreen200.color.withValues(alpha: 0.3),
+          width: 2,
+          style: _selectedVideo != null 
+              ? BorderStyle.solid 
+              : BorderStyle.none,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: ThemeColors.black.color.withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
+      child: _isUploading ? _buildUploadProgress() : _buildUploadContent(),
     );
   }
 
@@ -481,38 +497,85 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
           SizedBox(height: isMobile ? 16 : 24),
           _buildVideoTips(),
           SizedBox(height: isMobile ? 16 : 24),
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: isMobile ? 16 : 20, 
-              vertical: isMobile ? 10 : 12,
-            ),
-            decoration: BoxDecoration(
-              color: ThemeColors.lime500.color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: ThemeColors.lime500.color.withValues(alpha: 0.3),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.video_camera_back_outlined,
-                  color: ThemeColors.lime200.color,
-                  size: isMobile ? 18 : 20,
-                ),
-                SizedBox(width: isMobile ? 6 : 8),
-                Text(
-                  'Choose Video',
-                  style: TextStyle(
-                    color: ThemeColors.lime200.color,
-                    fontSize: isMobile ? 14 : 16,
-                    fontWeight: FontWeight.w600,
+          // Video recording and upload options
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: _recordVideo,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 12 : 16, 
+                      vertical: isMobile ? 10 : 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: ThemeColors.lime500.color.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: ThemeColors.lime500.color.withValues(alpha: 0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.videocam,
+                          color: ThemeColors.lime200.color,
+                          size: isMobile ? 24 : 28,
+                        ),
+                        SizedBox(height: isMobile ? 4 : 6),
+                        Text(
+                          'Record Video',
+                          style: TextStyle(
+                            color: ThemeColors.lime200.color,
+                            fontSize: isMobile ? 12 : 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: GestureDetector(
+                  onTap: _pickVideo,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 12 : 16, 
+                      vertical: isMobile ? 10 : 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: ThemeColors.mauve300.color.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: ThemeColors.mauve300.color.withValues(alpha: 0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.upload_file,
+                          color: ThemeColors.mauve300.color,
+                          size: isMobile ? 24 : 28,
+                        ),
+                        SizedBox(height: isMobile ? 4 : 6),
+                        Text(
+                          'Upload Video',
+                          style: TextStyle(
+                            color: ThemeColors.mauve300.color,
+                            fontSize: isMobile ? 12 : 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ] else ...[
           Container(
@@ -574,6 +637,31 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
                 ),
               ],
             ),
+          ),
+          SizedBox(height: isMobile ? 16 : 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _selectedVideo = null;
+                  });
+                },
+                icon: Icon(
+                  Icons.refresh,
+                  color: ThemeColors.mauve300.color,
+                  size: 18,
+                ),
+                label: Text(
+                  'Choose Different Video',
+                  style: TextStyle(
+                    color: ThemeColors.mauve300.color,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ],

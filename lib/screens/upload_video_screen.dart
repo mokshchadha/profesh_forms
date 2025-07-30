@@ -27,7 +27,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _rotationAnimation;
-  
+
   File? _selectedVideo;
   bool _isUploading = false;
   double _uploadProgress = 0.0;
@@ -39,36 +39,25 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    
+
     _uploadController = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
     );
-    
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
-    
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.elasticOut,
-    ));
-    
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+    );
+
     _rotationAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _uploadController,
-      curve: Curves.linear,
-    ));
-    
+    ).animate(CurvedAnimation(parent: _uploadController, curve: Curves.linear));
+
     _animationController.forward();
   }
 
@@ -80,9 +69,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
   }
 
   Future<void> _pickVideo() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.video,
-    );
+    final result = await FilePicker.platform.pickFiles(type: FileType.video);
 
     if (result != null) {
       setState(() {
@@ -96,8 +83,11 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
       context,
       MaterialPageRoute(
         builder: (context) => VideoRecorderScreen(
-          // jobId: widget.jobId,
+          jobId: widget.jobId,
           // userData: widget.userData,
+          jobDescription: 'desc',
+          jobTitle: 'dsec',
+          companyName: 'company',
         ),
       ),
     );
@@ -149,7 +139,8 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
             MaterialPageRoute(
               builder: (context) => const AlreadyAppliedScreen(
                 title: 'Application Complete!',
-                message: 'Your video resume has been uploaded successfully. Thank you for your comprehensive application!',
+                message:
+                    'Your video resume has been uploaded successfully. Thank you for your comprehensive application!',
                 showDownloadButton: true,
               ),
             ),
@@ -166,12 +157,12 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
     } catch (e) {
       _uploadController.stop();
       _uploadController.reset();
-      
+
       if (mounted) {
         setState(() {
           _isUploading = false;
         });
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error uploading video: $e'),
@@ -188,7 +179,8 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
       MaterialPageRoute(
         builder: (context) => const AlreadyAppliedScreen(
           title: 'Application Submitted!',
-          message: 'Your application has been successfully submitted. Thank you for applying!',
+          message:
+              'Your application has been successfully submitted. Thank you for applying!',
           showDownloadButton: true,
         ),
       ),
@@ -200,7 +192,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 600;
-    
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -226,13 +218,17 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
                   child: _buildHeader(),
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 16.0 : 24.0),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 16.0 : 24.0,
+                  ),
                   child: _buildProgressIndicator(),
                 ),
                 SizedBox(height: isMobile ? 16 : 24),
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(horizontal: isMobile ? 16.0 : 24.0),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 16.0 : 24.0,
+                    ),
                     child: Column(
                       children: [
                         ScaleTransition(
@@ -259,7 +255,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
   Widget _buildHeader() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 600;
-    
+
     return Row(
       children: [
         Container(
@@ -330,38 +326,39 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
     );
   }
 
-  Widget _buildProgressStep(int step, String label, bool active, bool completed) {
+  Widget _buildProgressStep(
+    int step,
+    String label,
+    bool active,
+    bool completed,
+  ) {
     return Column(
       children: [
         Container(
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: completed 
+            color: completed
                 ? ThemeColors.lime700.color
-                : active 
-                    ? ThemeColors.lime500.color 
-                    : ThemeColors.neutral4.color.withValues(alpha: 0.3),
+                : active
+                ? ThemeColors.lime500.color
+                : ThemeColors.neutral4.color.withValues(alpha: 0.3),
             shape: BoxShape.circle,
             border: Border.all(
               color: completed || active
-                  ? ThemeColors.lime200.color 
+                  ? ThemeColors.lime200.color
                   : ThemeColors.neutral4.color,
               width: 2,
             ),
           ),
           child: Center(
             child: completed
-                ? Icon(
-                    Icons.check,
-                    color: ThemeColors.neutral1.color,
-                    size: 16,
-                  )
+                ? Icon(Icons.check, color: ThemeColors.neutral1.color, size: 16)
                 : Text(
                     step.toString(),
                     style: TextStyle(
-                      color: active 
-                          ? ThemeColors.slateGreen900.color 
+                      color: active
+                          ? ThemeColors.slateGreen900.color
                           : ThemeColors.neutral3.color,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -374,7 +371,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
           label,
           style: TextStyle(
             color: (completed || active)
-                ? ThemeColors.lime200.color 
+                ? ThemeColors.lime200.color
                 : ThemeColors.neutral3.color,
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -390,8 +387,8 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
         height: 2,
         margin: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
-          color: active 
-              ? ThemeColors.lime500.color 
+          color: active
+              ? ThemeColors.lime500.color
               : ThemeColors.neutral4.color.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(1),
         ),
@@ -402,12 +399,10 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
   Widget _buildUploadArea() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 600;
-    
+
     return Container(
       width: double.infinity,
-      constraints: BoxConstraints(
-        minHeight: isMobile ? 400 : 500,
-      ),
+      constraints: BoxConstraints(minHeight: isMobile ? 400 : 500),
       padding: EdgeInsets.all(isMobile ? 20 : 32),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -424,9 +419,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
               ? ThemeColors.lime500.color
               : ThemeColors.slateGreen200.color.withValues(alpha: 0.3),
           width: 2,
-          style: _selectedVideo != null 
-              ? BorderStyle.solid 
-              : BorderStyle.none,
+          style: _selectedVideo != null ? BorderStyle.solid : BorderStyle.none,
         ),
         boxShadow: [
           BoxShadow(
@@ -443,7 +436,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
   Widget _buildUploadContent() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 600;
-    
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
@@ -505,7 +498,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
                   onTap: _recordVideo,
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: isMobile ? 12 : 16, 
+                      horizontal: isMobile ? 12 : 16,
                       vertical: isMobile ? 10 : 12,
                     ),
                     decoration: BoxDecoration(
@@ -543,14 +536,16 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
                   onTap: _pickVideo,
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: isMobile ? 12 : 16, 
+                      horizontal: isMobile ? 12 : 16,
                       vertical: isMobile ? 10 : 12,
                     ),
                     decoration: BoxDecoration(
                       color: ThemeColors.mauve300.color.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: ThemeColors.mauve300.color.withValues(alpha: 0.3),
+                        color: ThemeColors.mauve300.color.withValues(
+                          alpha: 0.3,
+                        ),
                         width: 1,
                       ),
                     ),
@@ -583,10 +578,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
             decoration: BoxDecoration(
               color: ThemeColors.lime500.color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
-              border: Border.all(
-                color: ThemeColors.lime500.color,
-                width: 2,
-              ),
+              border: Border.all(color: ThemeColors.lime500.color, width: 2),
             ),
             child: Icon(
               Icons.video_file,
@@ -671,7 +663,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
   Widget _buildVideoTips() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 600;
-    
+
     final tips = [
       {'icon': Icons.timer, 'text': 'Keep it under 90 seconds'},
       {'icon': Icons.lightbulb_outline, 'text': 'Good lighting & clear audio'},
@@ -701,28 +693,32 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
             ),
           ),
           SizedBox(height: isMobile ? 8 : 12),
-          ...tips.map((tip) => Padding(
-            padding: EdgeInsets.only(bottom: isMobile ? 6 : 8),
-            child: Row(
-              children: [
-                Icon(
-                  tip['icon'] as IconData,
-                  color: ThemeColors.slateGreen200.color,
-                  size: isMobile ? 14 : 16,
-                ),
-                SizedBox(width: isMobile ? 8 : 12),
-                Expanded(
-                  child: Text(
-                    tip['text'] as String,
-                    style: TextStyle(
-                      color: ThemeColors.neutral3.color,
-                      fontSize: isMobile ? 12 : 14,
-                    ),
+          ...tips
+              .map(
+                (tip) => Padding(
+                  padding: EdgeInsets.only(bottom: isMobile ? 6 : 8),
+                  child: Row(
+                    children: [
+                      Icon(
+                        tip['icon'] as IconData,
+                        color: ThemeColors.slateGreen200.color,
+                        size: isMobile ? 14 : 16,
+                      ),
+                      SizedBox(width: isMobile ? 8 : 12),
+                      Expanded(
+                        child: Text(
+                          tip['text'] as String,
+                          style: TextStyle(
+                            color: ThemeColors.neutral3.color,
+                            fontSize: isMobile ? 12 : 14,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          )).toList(),
+              )
+              .toList(),
         ],
       ),
     );
@@ -731,7 +727,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
   Widget _buildUploadProgress() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 600;
-    
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
@@ -808,7 +804,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
   Widget _buildActionButtons() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 600;
-    
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -818,10 +814,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
             height: isMobile ? 50 : 60,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  ThemeColors.lime200.color,
-                  ThemeColors.lime500.color,
-                ],
+                colors: [ThemeColors.lime200.color, ThemeColors.lime500.color],
               ),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
@@ -847,7 +840,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.upload_rounded, 
+                    Icons.upload_rounded,
                     size: isMobile ? 20 : 24,
                     color: ThemeColors.slateGreen900.color,
                   ),
@@ -872,21 +865,20 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
           child: OutlinedButton(
             onPressed: _isUploading ? null : _skipVideo,
             style: OutlinedButton.styleFrom(
-              side: BorderSide(
-                color: ThemeColors.mauve300.color, 
-                width: 2,
-              ),
+              side: BorderSide(color: ThemeColors.mauve300.color, width: 2),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              backgroundColor: ThemeColors.mauve300.color.withValues(alpha: 0.05),
+              backgroundColor: ThemeColors.mauve300.color.withValues(
+                alpha: 0.05,
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  Icons.check_rounded, 
-                  color: ThemeColors.mauve300.color, 
+                  Icons.check_rounded,
+                  color: ThemeColors.mauve300.color,
                   size: isMobile ? 20 : 24,
                 ),
                 SizedBox(width: isMobile ? 8 : 12),

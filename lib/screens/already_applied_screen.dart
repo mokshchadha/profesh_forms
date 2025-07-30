@@ -120,31 +120,44 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
         child: SafeArea(
           child: FadeTransition(
             opacity: _fadeAnimation,
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildFloatingElements(),
-                  ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: _buildSuccessIcon(),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height - 
+                            MediaQuery.of(context).padding.top - 
+                            MediaQuery.of(context).padding.bottom - 40,
+                ),
+                child: IntrinsicHeight(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildFloatingElements(),
+                      const SizedBox(height: 20),
+                      ScaleTransition(
+                        scale: _scaleAnimation,
+                        child: _buildSuccessIcon(),
+                      ),
+                      const SizedBox(height: 30),
+                      AnimatedBuilder(
+                        animation: _slideAnimation,
+                        builder: (context, child) {
+                          return Transform.translate(
+                            offset: Offset(0, _slideAnimation.value),
+                            child: _buildContentCard(),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 30),
+                      if (widget.showDownloadButton) ...[
+                        _buildDownloadButton(),
+                        const SizedBox(height: 16),
+                      ],
+                      _buildHomeButton(),
+                      const SizedBox(height: 20),
+                    ],
                   ),
-                  const SizedBox(height: 40),
-                  AnimatedBuilder(
-                    animation: _slideAnimation,
-                    builder: (context, child) {
-                      return Transform.translate(
-                        offset: Offset(0, _slideAnimation.value),
-                        child: _buildContentCard(),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 40),
-                  if (widget.showDownloadButton) _buildDownloadButton(),
-                  const SizedBox(height: 20),
-                  _buildHomeButton(),
-                ],
+                ),
               ),
             ),
           ),
@@ -156,44 +169,51 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
   Widget _buildFloatingElements() {
     if (!widget.showDownloadButton) return const SizedBox.shrink();
     
-    return AnimatedBuilder(
-      animation: _confettiController,
-      builder: (context, child) {
-        return Stack(
-          children: List.generate(6, (index) {
-            final offset = Offset(
-              (index * 60.0) - 150,
-              -100 + (_confettiController.value * 200),
-            );
-            return Positioned(
-              left: MediaQuery.of(context).size.width / 2 + offset.dx,
-              top: 100 + offset.dy,
-              child: Transform.rotate(
-                angle: _confettiController.value * 6.28 * (index + 1),
-                child: Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    color: [
-                      ThemeColors.lime500.color,
-                      ThemeColors.mauve300.color,
-                      ThemeColors.slateGreen200.color,
-                    ][index % 3],
-                    shape: BoxShape.circle,
+    return SizedBox(
+      height: 120,
+      width: double.infinity,
+      child: AnimatedBuilder(
+        animation: _confettiController,
+        builder: (context, child) {
+          return Stack(
+            clipBehavior: Clip.none,
+            children: List.generate(6, (index) {
+              final screenWidth = MediaQuery.of(context).size.width;
+              final baseX = screenWidth / 2;
+              final offset = Offset(
+                (index * 50.0) - 125 + (baseX - screenWidth / 2),
+                -20 + (_confettiController.value * 80),
+              );
+              return Positioned(
+                left: baseX + offset.dx,
+                top: 40 + offset.dy,
+                child: Transform.rotate(
+                  angle: _confettiController.value * 6.28 * (index + 1),
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: [
+                        ThemeColors.lime500.color,
+                        ThemeColors.mauve300.color,
+                        ThemeColors.slateGreen200.color,
+                      ][index % 3],
+                      shape: BoxShape.circle,
+                    ),
                   ),
                 ),
-              ),
-            );
-          }),
-        );
-      },
+              );
+            }),
+          );
+        },
+      ),
     );
   }
 
   Widget _buildSuccessIcon() {
     return Container(
-      width: 140,
-      height: 140,
+      width: 100,
+      height: 100,
       decoration: BoxDecoration(
         gradient: RadialGradient(
           colors: [
@@ -205,7 +225,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
         shape: BoxShape.circle,
       ),
       child: Container(
-        margin: const EdgeInsets.all(20),
+        margin: const EdgeInsets.all(15),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -217,14 +237,14 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
           boxShadow: [
             BoxShadow(
               color: ThemeColors.lime500.color.withValues(alpha: 0.5),
-              blurRadius: 30,
-              offset: const Offset(0, 10),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
         child: Icon(
           widget.showDownloadButton ? Icons.check_circle_rounded : Icons.info_rounded,
-          size: 60,
+          size: 45,
           color: ThemeColors.slateGreen900.color,
         ),
       ),
@@ -233,7 +253,8 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
 
   Widget _buildContentCard() {
     return Container(
-      padding: const EdgeInsets.all(32),
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -243,7 +264,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
             ThemeColors.slateGreen100.color.withValues(alpha: 0.05),
           ],
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: ThemeColors.slateGreen200.color.withValues(alpha: 0.2),
           width: 1,
@@ -251,8 +272,8 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
         boxShadow: [
           BoxShadow(
             color: ThemeColors.black.color.withValues(alpha: 0.3),
-            blurRadius: 30,
-            offset: const Offset(0, 15),
+            blurRadius: 25,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -262,7 +283,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
             widget.title,
             style: TextStyle(
               color: ThemeColors.neutral1.color,
-              fontSize: 28,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
               height: 1.2,
             ),
@@ -270,10 +291,10 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
           ),
           const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: ThemeColors.slateGreen900.color.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: ThemeColors.slateGreen200.color.withValues(alpha: 0.2),
                 width: 1,
@@ -283,15 +304,15 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
               widget.message,
               style: TextStyle(
                 color: ThemeColors.neutral2.color,
-                fontSize: 18,
-                height: 1.6,
+                fontSize: 16,
+                height: 1.5,
                 fontWeight: FontWeight.w400,
               ),
               textAlign: TextAlign.center,
             ),
           ),
           if (widget.showDownloadButton) ...[
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             _buildSuccessFeatures(),
           ],
         ],
@@ -307,12 +328,12 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
     ];
 
     return Column(
-      children: features.map((feature) => Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      children: features.take(1).map((feature) => Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           color: ThemeColors.mauve300.color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: ThemeColors.mauve300.color.withValues(alpha: 0.2),
             width: 1,
@@ -323,7 +344,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
             Icon(
               feature['icon'] as IconData,
               color: ThemeColors.mauve300.color,
-              size: 20,
+              size: 18,
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -331,7 +352,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
                 feature['text'] as String,
                 style: TextStyle(
                   color: ThemeColors.neutral2.color,
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -347,7 +368,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
       scale: _pulseAnimation,
       child: Container(
         width: double.infinity,
-        height: 60,
+        height: 50,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -355,12 +376,12 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
               ThemeColors.lime500.color,
             ],
           ),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
               color: ThemeColors.lime500.color.withValues(alpha: 0.4),
-              blurRadius: 25,
-              offset: const Offset(0, 10),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
@@ -372,7 +393,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
             elevation: 0,
             shadowColor: Colors.transparent,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
             ),
           ),
           child: Row(
@@ -380,14 +401,14 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
             children: [
               Icon(
                 Icons.download_rounded,
-                size: 24,
+                size: 20,
                 color: ThemeColors.slateGreen900.color,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Text(
                 'Download Profesh App',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: ThemeColors.slateGreen900.color,
                 ),
@@ -402,9 +423,9 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
   Widget _buildHomeButton() {
     return Container(
       width: double.infinity,
-      height: 60,
+      height: 50,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: ThemeColors.mauve300.color,
           width: 2,
@@ -412,8 +433,8 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
         boxShadow: [
           BoxShadow(
             color: ThemeColors.mauve300.color.withValues(alpha: 0.2),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -424,7 +445,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
         style: OutlinedButton.styleFrom(
           side: BorderSide.none,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
           ),
           backgroundColor: ThemeColors.mauve300.color.withValues(alpha: 0.05),
         ),
@@ -434,13 +455,13 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
             Icon(
               Icons.home_rounded,
               color: ThemeColors.mauve300.color,
-              size: 24,
+              size: 20,
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Text(
               'Back to Home',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: ThemeColors.mauve300.color,
               ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:profesh_forms/constants.dart';
+import 'package:profesh_forms/screens/already_applied_screen.dart';
 import 'package:profesh_forms/screens/video_recorder_screen.dart';
 import 'screens/landing_screen.dart';
 
@@ -211,7 +212,7 @@ class JobApplicationApp extends StatelessWidget {
           circularTrackColor: ThemeColors.neutral4.color.withValues(alpha: 0.3),
         ),
       ),
-      home:  VideoRecorderScreen(),
+      home:  LandingScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

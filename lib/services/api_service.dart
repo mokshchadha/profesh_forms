@@ -21,7 +21,9 @@ class ApiService {
       'description': 'We are looking for an experienced Flutter developer to join our dynamic team. You will be responsible for developing high-quality mobile applications using Flutter framework. The ideal candidate should have strong knowledge of Dart programming language, state management solutions like Provider or Bloc, and experience with RESTful APIs integration.',
       'location': 'Bengaluru, Karnataka',
       'type': 'Full-time',
-      'logo': 'https://example.com/logo.png'
+      'logo': 'https://example.com/logo.png',
+      'videoUrl': '',
+      'jdPdf':'',
     };
   }
   Future<dynamic> checkApplicationStatus(String jobId, String email, String phone) async {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:profesh_forms/constants.dart';
 import 'package:profesh_forms/screens/upload_video_screen.dart';
+import 'package:profesh_forms/components/pdf_preview_widget.dart';
 import '../services/api_service.dart';
 
 class UploadCVScreen extends StatefulWidget {
@@ -29,6 +30,7 @@ class _UploadCVScreenState extends State<UploadCVScreen>
   
   File? _selectedFile;
   bool _isUploading = false;
+  bool _showPreview = false;
   double _uploadProgress = 0.0;
 
   @override
@@ -87,8 +89,16 @@ class _UploadCVScreenState extends State<UploadCVScreen>
     if (result != null) {
       setState(() {
         _selectedFile = File(result.files.single.path!);
+        _showPreview = true;
       });
     }
+  }
+
+  void _clearSelection() {
+    setState(() {
+      _selectedFile = null;
+      _showPreview = false;
+    });
   }
 
   Future<void> _uploadFile() async {
@@ -207,7 +217,11 @@ class _UploadCVScreenState extends State<UploadCVScreen>
                   Expanded(
                     child: ScaleTransition(
                       scale: _scaleAnimation,
-                      child: _buildUploadArea(),
+                      child: _isUploading 
+                          ? _buildUploadProgress()
+                          : _showPreview && _selectedFile != null
+                              ? _buildPreviewArea()
+                              : _buildUploadArea(),
                     ),
                   ),
                   _buildActionButtons(),
@@ -360,6 +374,17 @@ class _UploadCVScreenState extends State<UploadCVScreen>
     );
   }
 
+  Widget _buildPreviewArea() {
+    return SingleChildScrollView(
+      child: PDFPreviewWidget(
+        pdfFile: _selectedFile!,
+        onReselect: _clearSelection,
+        onConfirm: _uploadFile,
+        showActions: true,
+      ),
+    );
+  }
+
   Widget _buildUploadArea() {
     return Center(
       child: GestureDetector(
@@ -378,13 +403,8 @@ class _UploadCVScreenState extends State<UploadCVScreen>
             ),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: _selectedFile != null
-                  ? ThemeColors.lime500.color
-                  : ThemeColors.slateGreen200.color.withValues(alpha: 0.3),
+              color: ThemeColors.slateGreen200.color.withValues(alpha: 0.3),
               width: 2,
-              style: _selectedFile != null 
-                  ? BorderStyle.solid 
-                  : BorderStyle.none,
             ),
             boxShadow: [
               BoxShadow(
@@ -394,221 +414,182 @@ class _UploadCVScreenState extends State<UploadCVScreen>
               ),
             ],
           ),
-          child: _isUploading ? _buildUploadProgress() : _buildUploadContent(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      ThemeColors.mauve300.color.withValues(alpha: 0.2),
+                      ThemeColors.mauve500.color.withValues(alpha: 0.1),
+                    ],
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.description_outlined,
+                  size: 64,
+                  color: ThemeColors.mauve300.color,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Upload Your CV',
+                style: TextStyle(
+                  color: ThemeColors.neutral1.color,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Drag and drop your CV or click to browse',
+                style: TextStyle(
+                  color: ThemeColors.slateGreen200.color,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Supported formats: PDF, DOC, DOCX',
+                style: TextStyle(
+                  color: ThemeColors.neutral3.color,
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                decoration: BoxDecoration(
+                  color: ThemeColors.lime500.color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: ThemeColors.lime500.color.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.cloud_upload_outlined,
+                      color: ThemeColors.lime200.color,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Choose File',
+                      style: TextStyle(
+                        color: ThemeColors.lime200.color,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildUploadContent() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (_selectedFile == null) ...[
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  ThemeColors.mauve300.color.withValues(alpha: 0.2),
-                  ThemeColors.mauve500.color.withValues(alpha: 0.1),
-                ],
-              ),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.description_outlined,
-              size: 64,
-              color: ThemeColors.mauve300.color,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Upload Your CV',
-            style: TextStyle(
-              color: ThemeColors.neutral1.color,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Drag and drop your CV or click to browse',
-            style: TextStyle(
-              color: ThemeColors.slateGreen200.color,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Supported formats: PDF, DOC, DOCX',
-            style: TextStyle(
-              color: ThemeColors.neutral3.color,
-              fontSize: 14,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            decoration: BoxDecoration(
-              color: ThemeColors.lime500.color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: ThemeColors.lime500.color.withValues(alpha: 0.3),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.cloud_upload_outlined,
-                  color: ThemeColors.lime200.color,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Choose File',
-                  style: TextStyle(
-                    color: ThemeColors.lime200.color,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ] else ...[
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: ThemeColors.lime500.color.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: ThemeColors.lime500.color,
-                width: 2,
-              ),
-            ),
-            child: Icon(
-              Icons.description,
-              size: 64,
-              color: ThemeColors.lime500.color,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'CV Selected',
-            style: TextStyle(
-              color: ThemeColors.neutral1.color,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: ThemeColors.slateGreen900.color.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: ThemeColors.slateGreen200.color.withValues(alpha: 0.2),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.insert_drive_file,
-                  color: ThemeColors.lime200.color,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    _selectedFile!.path.split('/').last,
-                    style: TextStyle(
-                      color: ThemeColors.neutral2.color,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
   Widget _buildUploadProgress() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        RotationTransition(
-          turns: _rotationAnimation,
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: ThemeColors.lime500.color.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+    return Center(
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              ThemeColors.neutral1.color.withValues(alpha: 0.08),
+              ThemeColors.slateGreen100.color.withValues(alpha: 0.05),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: ThemeColors.lime500.color.withValues(alpha: 0.3),
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: ThemeColors.black.color.withValues(alpha: 0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
             ),
-            child: Icon(
-              Icons.upload_file,
-              size: 64,
-              color: ThemeColors.lime500.color,
-            ),
-          ),
+          ],
         ),
-        const SizedBox(height: 30),
-        Text(
-          'Uploading CV...',
-          style: TextStyle(
-            color: ThemeColors.neutral1.color,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 20),
-        Container(
-          width: 250,
-          height: 8,
-          decoration: BoxDecoration(
-            color: ThemeColors.neutral4.color.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: FractionallySizedBox(
-            alignment: Alignment.centerLeft,
-            widthFactor: _uploadProgress,
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    ThemeColors.lime200.color,
-                    ThemeColors.lime500.color,
-                  ],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            RotationTransition(
+              turns: _rotationAnimation,
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: ThemeColors.lime500.color.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
                 ),
+                child: Icon(
+                  Icons.upload_file,
+                  size: 64,
+                  color: ThemeColors.lime500.color,
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+            Text(
+              'Uploading CV...',
+              style: TextStyle(
+                color: ThemeColors.neutral1.color,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              width: 250,
+              height: 8,
+              decoration: BoxDecoration(
+                color: ThemeColors.neutral4.color.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(4),
               ),
+              child: FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: _uploadProgress,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        ThemeColors.lime200.color,
+                        ThemeColors.lime500.color,
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
             ),
-          ),
+            const SizedBox(height: 12),
+            Text(
+              '${(_uploadProgress * 100).toInt()}%',
+              style: TextStyle(
+                color: ThemeColors.lime200.color,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 12),
-        Text(
-          '${(_uploadProgress * 100).toInt()}%',
-          style: TextStyle(
-            color: ThemeColors.lime200.color,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -617,33 +598,22 @@ class _UploadCVScreenState extends State<UploadCVScreen>
       padding: const EdgeInsets.only(bottom: 20),
       child: Column(
         children: [
-          if (_selectedFile != null) ...[
-            Container(
+          // Only show upload button when preview is visible and not uploading
+          if (_showPreview && _selectedFile != null && !_isUploading) ...[
+            // Action buttons are now handled by the PDFPreviewWidget
+            const SizedBox.shrink(),
+          ] else if (!_showPreview && !_isUploading) ...[
+            // Show skip button when no file is selected
+            SizedBox(
               width: double.infinity,
               height: 60,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    ThemeColors.lime200.color,
-                    ThemeColors.lime500.color,
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: ThemeColors.lime500.color.withValues(alpha: 0.4),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
+              child: OutlinedButton(
+                onPressed: _skipToVideo, 
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color: ThemeColors.mauve300.color, 
+                    width: 2,
                   ),
-                ],
-              ),
-              child: ElevatedButton(
-                onPressed: _isUploading ? null : _uploadFile,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  foregroundColor: ThemeColors.slateGreen900.color,
-                  elevation: 0,
-                  shadowColor: Colors.transparent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -652,62 +622,25 @@ class _UploadCVScreenState extends State<UploadCVScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.upload_rounded, 
+                      Icons.skip_next_rounded, 
+                      color: ThemeColors.mauve300.color, 
                       size: 24,
-                      color: ThemeColors.slateGreen900.color,
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      'Upload CV',
+                      'Skip & Continue',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: ThemeColors.slateGreen900.color,
+                        color: ThemeColors.mauve300.color,
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 16),
           ],
-          SizedBox(
-            width: double.infinity,
-            height: 60,
-            child: OutlinedButton(
-              onPressed: _isUploading ? null : _skipToVideo, 
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(
-                  color: ThemeColors.mauve300.color, 
-                  width: 2,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.skip_next_rounded, 
-                    color: ThemeColors.mauve300.color, 
-                    size: 24,
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Skip & Continue',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: ThemeColors.mauve300.color,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
         ],
       ),
     );
-  }
-}
+  }}

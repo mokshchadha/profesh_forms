@@ -35,7 +35,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    
+
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
@@ -45,39 +45,23 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
       duration: const Duration(milliseconds: 3000),
       vsync: this,
     );
-    
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
-    
-    _scaleAnimation = Tween<double>(
-      begin: 0.3,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.elasticOut,
-    ));
 
-    _slideAnimation = Tween<double>(
-      begin: 50.0,
-      end: 0.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-    ));
-    
-    _pulseAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.05,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
-    
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+    );
+
+    _slideAnimation = Tween<double>(begin: 50.0, end: 0.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
+    );
+
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
     _animationController.forward();
     if (widget.showDownloadButton) {
       _pulseController.repeat(reverse: true);
@@ -94,7 +78,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
   }
 
   Future<void> _launchProfeshApp() async {
-    const url = 'https://profesh-app.netlify.app/';
+    const url = downloadApp;
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
     }
@@ -124,9 +108,11 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
               padding: const EdgeInsets.all(20.0),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height - 
-                            MediaQuery.of(context).padding.top - 
-                            MediaQuery.of(context).padding.bottom - 40,
+                  minHeight:
+                      MediaQuery.of(context).size.height -
+                      MediaQuery.of(context).padding.top -
+                      MediaQuery.of(context).padding.bottom -
+                      40,
                 ),
                 child: IntrinsicHeight(
                   child: Column(
@@ -168,7 +154,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
 
   Widget _buildFloatingElements() {
     if (!widget.showDownloadButton) return const SizedBox.shrink();
-    
+
     return SizedBox(
       height: 120,
       width: double.infinity,
@@ -228,10 +214,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
         margin: const EdgeInsets.all(15),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              ThemeColors.lime200.color,
-              ThemeColors.lime500.color,
-            ],
+            colors: [ThemeColors.lime200.color, ThemeColors.lime500.color],
           ),
           shape: BoxShape.circle,
           boxShadow: [
@@ -243,7 +226,9 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
           ],
         ),
         child: Icon(
-          widget.showDownloadButton ? Icons.check_circle_rounded : Icons.info_rounded,
+          widget.showDownloadButton
+              ? Icons.check_circle_rounded
+              : Icons.info_rounded,
           size: 45,
           color: ThemeColors.slateGreen900.color,
         ),
@@ -322,44 +307,55 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
 
   Widget _buildSuccessFeatures() {
     final features = [
-      {'icon': Icons.notifications_active, 'text': 'You\'ll receive updates via email'},
+      {
+        'icon': Icons.notifications_active,
+        'text': 'You\'ll receive updates via email',
+      },
       {'icon': Icons.speed, 'text': 'Fast-track review process'},
-      {'icon': Icons.mobile_friendly, 'text': 'Download our app for more opportunities'},
+      {
+        'icon': Icons.mobile_friendly,
+        'text': 'Download our app for more opportunities',
+      },
     ];
 
     return Column(
-      children: features.take(1).map((feature) => Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: ThemeColors.mauve300.color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: ThemeColors.mauve300.color.withValues(alpha: 0.2),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              feature['icon'] as IconData,
-              color: ThemeColors.mauve300.color,
-              size: 18,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                feature['text'] as String,
-                style: TextStyle(
-                  color: ThemeColors.neutral2.color,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
+      children: features
+          .take(1)
+          .map(
+            (feature) => Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: ThemeColors.mauve300.color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: ThemeColors.mauve300.color.withValues(alpha: 0.2),
+                  width: 1,
                 ),
               ),
+              child: Row(
+                children: [
+                  Icon(
+                    feature['icon'] as IconData,
+                    color: ThemeColors.mauve300.color,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      feature['text'] as String,
+                      style: TextStyle(
+                        color: ThemeColors.neutral2.color,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-      )).toList(),
+          )
+          .toList(),
     );
   }
 
@@ -371,10 +367,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
         height: 50,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              ThemeColors.lime200.color,
-              ThemeColors.lime500.color,
-            ],
+            colors: [ThemeColors.lime200.color, ThemeColors.lime500.color],
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
@@ -426,10 +419,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
       height: 50,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: ThemeColors.mauve300.color,
-          width: 2,
-        ),
+        border: Border.all(color: ThemeColors.mauve300.color, width: 2),
         boxShadow: [
           BoxShadow(
             color: ThemeColors.mauve300.color.withValues(alpha: 0.2),

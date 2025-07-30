@@ -212,7 +212,14 @@ class JobApplicationApp extends StatelessWidget {
           circularTrackColor: ThemeColors.neutral4.color.withValues(alpha: 0.3),
         ),
       ),
-      home:  LandingScreen(),
+      
+      onGenerateRoute: (settings) {
+        return MaterialPageRoute(
+          builder: (context) => const LandingScreen(),
+        );
+      },
+    
+      initialRoute: '/',
       debugShowCheckedModeBanner: false,
     );
   }

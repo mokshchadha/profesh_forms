@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:profesh_forms/components/video_preview_widget.dart';
 import 'package:profesh_forms/constants.dart';
 import 'package:profesh_forms/screens/already_applied_screen.dart';
 import 'package:profesh_forms/screens/video_recorder_screen.dart';
@@ -30,6 +31,8 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
 
   File? _selectedVideo;
   bool _isUploading = false;
+  bool _isSubmitting = false;
+  bool _showPreview = false;
   double _uploadProgress = 0.0;
 
   @override
@@ -74,6 +77,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
     if (result != null) {
       setState(() {
         _selectedVideo = File(result.files.single.path!);
+        _showPreview = true;
       });
     }
   }
@@ -84,10 +88,10 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
       MaterialPageRoute(
         builder: (context) => VideoRecorderScreen(
           jobId: widget.jobId,
-          // userData: widget.userData,
-          jobDescription: 'desc',
-          jobTitle: 'dsec',
-          companyName: 'company',
+          jobDescription:
+              'Please introduce yourself and tell us why you\'re interested in this position.',
+          jobTitle: 'Video Introduction',
+          companyName: 'Company',
         ),
       ),
     );
@@ -95,8 +99,16 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
     if (result != null) {
       setState(() {
         _selectedVideo = result;
+        _showPreview = true;
       });
     }
+  }
+
+  void _clearSelection() {
+    setState(() {
+      _selectedVideo = null;
+      _showPreview = false;
+    });
   }
 
   Future<void> _uploadVideo() async {
@@ -108,6 +120,8 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
     });
 
     _uploadController.repeat();
+
+    // Simulate upload progress
     for (int i = 0; i <= 100; i += 4) {
       await Future.delayed(const Duration(milliseconds: 150));
       if (mounted) {
@@ -134,23 +148,10 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
         });
 
         if (response['success'] == true) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const AlreadyAppliedScreen(
-                title: 'Application Complete!',
-                message:
-                    'Your video resume has been uploaded successfully. Thank you for your comprehensive application!',
-                showDownloadButton: true,
-              ),
-            ),
-          );
+          _navigateToSuccessScreen(true);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Upload failed. Please try again.'),
-              backgroundColor: ThemeColors.red.color,
-            ),
+          _showErrorSnackBar(
+            'Upload failed: ${response['error'] ?? 'Unknown error'}',
           );
         }
       }
@@ -162,27 +163,68 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
         setState(() {
           _isUploading = false;
         });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error uploading video: $e'),
-            backgroundColor: ThemeColors.red.color,
-          ),
-        );
+        _showErrorSnackBar('Error uploading video: $e');
       }
     }
   }
 
   Future<void> _skipVideo() async {
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      final apiService = ApiService();
+      final response = await apiService.submitApplicationWithoutVideo(
+        widget.jobId,
+        widget.userData,
+      );
+
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+
+        if (response['success'] == true) {
+          _navigateToSuccessScreen(false);
+        } else {
+          _showErrorSnackBar(
+            'Application submission failed: ${response['error'] ?? 'Unknown error'}',
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+        _showErrorSnackBar('Error submitting application: $e');
+      }
+    }
+  }
+
+  void _navigateToSuccessScreen(bool withVideo) {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => const AlreadyAppliedScreen(
-          title: 'Application Submitted!',
-          message:
-              'Your application has been successfully submitted. Thank you for applying!',
+        builder: (context) => AlreadyAppliedScreen(
+          title: 'Application Complete!',
+          message: withVideo
+              ? 'Your video resume has been uploaded successfully. Thank you for your comprehensive application!'
+              : 'Your application has been successfully submitted. Thank you for applying!',
           showDownloadButton: true,
         ),
+      ),
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: ThemeColors.red.color,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
@@ -233,7 +275,11 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
                       children: [
                         ScaleTransition(
                           scale: _scaleAnimation,
-                          child: _buildUploadArea(),
+                          child: (_isUploading || _isSubmitting)
+                              ? _buildUploadProgress()
+                              : _showPreview && _selectedVideo != null
+                              ? _buildPreviewArea()
+                              : _buildUploadArea(),
                         ),
                         SizedBox(height: isMobile ? 20 : 32),
                       ],
@@ -268,7 +314,9 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
             ),
           ),
           child: IconButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: (_isUploading || _isSubmitting)
+                ? null
+                : () => Navigator.pop(context),
             icon: Icon(
               Icons.arrow_back_rounded,
               color: ThemeColors.mauve100.color,
@@ -396,6 +444,16 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
     );
   }
 
+  Widget _buildPreviewArea() {
+    return VideoPreviewWidget(
+      videoFile: _selectedVideo!,
+      onReselect: _clearSelection,
+      onConfirm: _uploadVideo,
+      showActions: true,
+      autoPlay: false,
+    );
+  }
+
   Widget _buildUploadArea() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 600;
@@ -415,11 +473,8 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: _selectedVideo != null
-              ? ThemeColors.lime500.color
-              : ThemeColors.slateGreen200.color.withValues(alpha: 0.3),
+          color: ThemeColors.slateGreen200.color.withValues(alpha: 0.3),
           width: 2,
-          style: _selectedVideo != null ? BorderStyle.solid : BorderStyle.none,
         ),
         boxShadow: [
           BoxShadow(
@@ -429,19 +484,10 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
           ),
         ],
       ),
-      child: _isUploading ? _buildUploadProgress() : _buildUploadContent(),
-    );
-  }
-
-  Widget _buildUploadContent() {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth <= 600;
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (_selectedVideo == null) ...[
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
           Container(
             padding: EdgeInsets.all(isMobile ? 20 : 24),
             decoration: BoxDecoration(
@@ -572,91 +618,8 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
               ),
             ],
           ),
-        ] else ...[
-          Container(
-            padding: EdgeInsets.all(isMobile ? 20 : 24),
-            decoration: BoxDecoration(
-              color: ThemeColors.lime500.color.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-              border: Border.all(color: ThemeColors.lime500.color, width: 2),
-            ),
-            child: Icon(
-              Icons.video_file,
-              size: isMobile ? 48 : 64,
-              color: ThemeColors.lime500.color,
-            ),
-          ),
-          SizedBox(height: isMobile ? 16 : 24),
-          Text(
-            'Video Selected',
-            style: TextStyle(
-              color: ThemeColors.neutral1.color,
-              fontSize: isMobile ? 20 : 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: isMobile ? 8 : 12),
-          Container(
-            padding: EdgeInsets.all(isMobile ? 12 : 16),
-            decoration: BoxDecoration(
-              color: ThemeColors.slateGreen900.color.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: ThemeColors.slateGreen200.color.withValues(alpha: 0.2),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.play_circle_outline,
-                  color: ThemeColors.lime200.color,
-                  size: isMobile ? 18 : 20,
-                ),
-                SizedBox(width: isMobile ? 6 : 8),
-                Flexible(
-                  child: Text(
-                    _selectedVideo!.path.split('/').last,
-                    style: TextStyle(
-                      color: ThemeColors.neutral2.color,
-                      fontSize: isMobile ? 14 : 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: isMobile ? 16 : 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextButton.icon(
-                onPressed: () {
-                  setState(() {
-                    _selectedVideo = null;
-                  });
-                },
-                icon: Icon(
-                  Icons.refresh,
-                  color: ThemeColors.mauve300.color,
-                  size: 18,
-                ),
-                label: Text(
-                  'Choose Different Video',
-                  style: TextStyle(
-                    color: ThemeColors.mauve300.color,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ],
-          ),
         ],
-      ],
+      ),
     );
   }
 
@@ -728,173 +691,157 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 600;
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        RotationTransition(
-          turns: _rotationAnimation,
-          child: Container(
-            padding: EdgeInsets.all(isMobile ? 16 : 20),
-            decoration: BoxDecoration(
-              color: ThemeColors.lime500.color.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.video_camera_back,
-              size: isMobile ? 48 : 64,
-              color: ThemeColors.lime500.color,
-            ),
-          ),
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(isMobile ? 20 : 32),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            ThemeColors.neutral1.color.withValues(alpha: 0.08),
+            ThemeColors.slateGreen100.color.withValues(alpha: 0.05),
+          ],
         ),
-        SizedBox(height: isMobile ? 20 : 30),
-        Text(
-          'Uploading Video...',
-          style: TextStyle(
-            color: ThemeColors.neutral1.color,
-            fontSize: isMobile ? 18 : 20,
-            fontWeight: FontWeight.bold,
-          ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: ThemeColors.lime500.color.withValues(alpha: 0.3),
+          width: 2,
         ),
-        SizedBox(height: isMobile ? 4 : 8),
-        Text(
-          'This may take a few moments',
-          style: TextStyle(
-            color: ThemeColors.neutral3.color,
-            fontSize: isMobile ? 12 : 14,
+        boxShadow: [
+          BoxShadow(
+            color: ThemeColors.black.color.withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
-        ),
-        SizedBox(height: isMobile ? 16 : 20),
-        Container(
-          width: isMobile ? 200 : 250,
-          height: 8,
-          decoration: BoxDecoration(
-            color: ThemeColors.neutral4.color.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: FractionallySizedBox(
-            alignment: Alignment.centerLeft,
-            widthFactor: _uploadProgress,
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          RotationTransition(
+            turns: _rotationAnimation,
             child: Container(
+              padding: EdgeInsets.all(isMobile ? 16 : 20),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    ThemeColors.lime200.color,
-                    ThemeColors.lime500.color,
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(4),
+                color: ThemeColors.lime500.color.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _isUploading ? Icons.video_camera_back : Icons.send,
+                size: isMobile ? 48 : 64,
+                color: ThemeColors.lime500.color,
               ),
             ),
           ),
-        ),
-        SizedBox(height: isMobile ? 8 : 12),
-        Text(
-          '${(_uploadProgress * 100).toInt()}%',
-          style: TextStyle(
-            color: ThemeColors.lime200.color,
-            fontSize: isMobile ? 14 : 16,
-            fontWeight: FontWeight.bold,
+          SizedBox(height: isMobile ? 20 : 30),
+          Text(
+            _isUploading ? 'Uploading Video...' : 'Submitting Application...',
+            style: TextStyle(
+              color: ThemeColors.neutral1.color,
+              fontSize: isMobile ? 18 : 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-      ],
+          SizedBox(height: isMobile ? 4 : 8),
+          Text(
+            _isUploading
+                ? 'This may take a few moments'
+                : 'Please wait while we process your application',
+            style: TextStyle(
+              color: ThemeColors.neutral3.color,
+              fontSize: isMobile ? 12 : 14,
+            ),
+          ),
+          if (_isUploading) ...[
+            SizedBox(height: isMobile ? 16 : 20),
+            Container(
+              width: isMobile ? 200 : 250,
+              height: 8,
+              decoration: BoxDecoration(
+                color: ThemeColors.neutral4.color.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: _uploadProgress,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        ThemeColors.lime200.color,
+                        ThemeColors.lime500.color,
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: isMobile ? 8 : 12),
+            Text(
+              '${(_uploadProgress * 100).toInt()}%',
+              style: TextStyle(
+                color: ThemeColors.lime200.color,
+                fontSize: isMobile ? 14 : 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 
   Widget _buildActionButtons() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 600;
+    final isProcessing = _isUploading || _isSubmitting;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (_selectedVideo != null) ...[
-          Container(
-            width: double.infinity,
-            height: isMobile ? 50 : 60,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [ThemeColors.lime200.color, ThemeColors.lime500.color],
-              ),
+    // When showing preview, actions are handled by VideoPreviewWidget
+    if (_showPreview && _selectedVideo != null && !isProcessing) {
+      return const SizedBox.shrink();
+    }
+
+    // When not showing preview and not processing, show submit button
+    if (!_showPreview && !isProcessing) {
+      return SizedBox(
+        width: double.infinity,
+        height: isMobile ? 50 : 60,
+        child: OutlinedButton(
+          onPressed: _skipVideo,
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: ThemeColors.mauve300.color, width: 2),
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: ThemeColors.lime500.color.withValues(alpha: 0.4),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
-                ),
-              ],
             ),
-            child: ElevatedButton(
-              onPressed: _isUploading ? null : _uploadVideo,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                foregroundColor: ThemeColors.slateGreen900.color,
-                elevation: 0,
-                shadowColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.upload_rounded,
-                    size: isMobile ? 20 : 24,
-                    color: ThemeColors.slateGreen900.color,
-                  ),
-                  SizedBox(width: isMobile ? 8 : 12),
-                  Text(
-                    'Upload Video',
-                    style: TextStyle(
-                      fontSize: isMobile ? 16 : 18,
-                      fontWeight: FontWeight.bold,
-                      color: ThemeColors.slateGreen900.color,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            backgroundColor: ThemeColors.mauve300.color.withValues(alpha: 0.05),
           ),
-          SizedBox(height: isMobile ? 12 : 16),
-        ],
-        SizedBox(
-          width: double.infinity,
-          height: isMobile ? 50 : 60,
-          child: OutlinedButton(
-            onPressed: _isUploading ? null : _skipVideo,
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(color: ThemeColors.mauve300.color, width: 2),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.check_rounded,
+                color: ThemeColors.mauve300.color,
+                size: isMobile ? 20 : 24,
               ),
-              backgroundColor: ThemeColors.mauve300.color.withValues(
-                alpha: 0.05,
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.check_rounded,
+              SizedBox(width: isMobile ? 8 : 12),
+              Text(
+                'Submit Application',
+                style: TextStyle(
+                  fontSize: isMobile ? 16 : 18,
+                  fontWeight: FontWeight.bold,
                   color: ThemeColors.mauve300.color,
-                  size: isMobile ? 20 : 24,
                 ),
-                SizedBox(width: isMobile ? 8 : 12),
-                Text(
-                  'Submit Application',
-                  style: TextStyle(
-                    fontSize: isMobile ? 16 : 18,
-                    fontWeight: FontWeight.bold,
-                    color: ThemeColors.mauve300.color,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-      ],
-    );
+      );
+    }
+
+    // When processing, show nothing (progress info is in the main content area)
+    return const SizedBox.shrink();
   }
 }

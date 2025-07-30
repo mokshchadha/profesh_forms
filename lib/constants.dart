@@ -227,4 +227,5 @@ final emailRegex = RegExp(r'^[\w-\.]+@[\w-\.]+\.[a-z]{2,4}$');
 const profeshPublicURL = 'https://profesh.web.app';
 const watiNumber = '+918951437501';
 const contactUsEmail = 'team@joinprofesh.com';
+const downloadApp = 'https://profesh-app.netlify.app/';
 const serverUrl = sandboxURL;

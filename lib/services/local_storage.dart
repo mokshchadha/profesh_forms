@@ -1,4 +1,3 @@
-
 import 'package:profesh_forms/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -38,10 +37,20 @@ class LocalStorageService {
     return prefs.getString(key);
   }
 
+  Future<void> clearData(String key) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove(key);
+  }
+
   Future<void> clearUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
     await prefs.remove('id');
     await prefs.remove('userType');
+  }
+
+  Future<void> clearAllData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
   }
 }

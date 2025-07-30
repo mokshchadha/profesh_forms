@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:profesh_forms/constants.dart';
 import '../services/api_service.dart';
+import '../utils/url_utils.dart';
 import 'basic_form_screen.dart';
+import 'error_screen.dart';
 
 class LandingScreen extends StatefulWidget {
-  const LandingScreen({super.key});
+  final String? projectHash;
+
+  const LandingScreen({super.key, this.projectHash});
 
   @override
   State<LandingScreen> createState() => _LandingScreenState();
@@ -18,7 +22,10 @@ class _LandingScreenState extends State<LandingScreen>
 
   Map<String, dynamic>? jobData;
   bool isLoading = true;
-  String? jobId;
+  bool hasError = false;
+  String? errorMessage;
+  String? projectHash;
+  int? statusCode;
 
   @override
   void initState() {
@@ -50,18 +57,101 @@ class _LandingScreenState extends State<LandingScreen>
   }
 
   Future<void> _loadJobData() async {
-    // Extract jobId from URL parameters (simulate for now) 
-    jobId = "job123"; // In real app, get from URL params
+    try {
+      // Extract projectHash from URL
+      projectHash = _extractHashFromUrl();
 
-    final apiService = ApiService();
-    final response = await apiService.getJobDetails(jobId!);
+      if (projectHash == null || projectHash!.isEmpty) {
+        setState(() {
+          hasError = true;
+          errorMessage = 'Invalid job link';
+          statusCode = 400;
+          isLoading = false;
+        });
+        return;
+      }
 
+      final apiService = ApiService();
+      final response = await apiService.getJobDetails(projectHash!);
+
+      if (response['success'] == true) {
+        setState(() {
+          jobData = response;
+          isLoading = false;
+          hasError = false;
+        });
+        _animationController.forward();
+      } else {
+        setState(() {
+          hasError = true;
+          errorMessage = response['error'] ?? 'Failed to load job details';
+          statusCode = response['statusCode'];
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        hasError = true;
+        errorMessage = 'Network error';
+        statusCode = null;
+        isLoading = false;
+      });
+    }
+  }
+
+  String? _extractHashFromUrl() {
+    try {
+      final hash = UrlUtils.extractHashFromUrl();
+
+      if (hash == null) {
+        UrlUtils.debugUrl();
+      }
+
+      return hash;
+    } catch (e) {
+      debugPrint('Error extracting hash from URL: $e');
+      return null;
+    }
+  }
+
+  void _handleRetry() {
     setState(() {
-      jobData = response;
-      isLoading = false;
+      isLoading = true;
+      hasError = false;
+      errorMessage = null;
+      statusCode = null;
     });
+    _loadJobData();
+  }
 
-    _animationController.forward();
+  ErrorScreen _getErrorScreen() {
+    if (projectHash == null || projectHash!.isEmpty) {
+      return ErrorScreen.invalidUrl(
+        url: Uri.base.toString(),
+        onRetry: _handleRetry,
+      );
+    }
+
+    if (statusCode == 404) {
+      return ErrorScreen.jobNotFound(jobId: projectHash, onRetry: _handleRetry);
+    }
+
+    if (statusCode == null ||
+        errorMessage?.toLowerCase().contains('network') == true) {
+      return ErrorScreen.networkError(onRetry: _handleRetry);
+    }
+
+    if (statusCode == 500) {
+      return ErrorScreen.serverError(onRetry: _handleRetry);
+    }
+
+    return ErrorScreen(
+      title: 'Unable to Load Job',
+      message:
+          errorMessage ?? 'An unexpected error occurred. Please try again.',
+      debugInfo: projectHash != null ? 'Job ID: $projectHash' : null,
+      onRetry: _handleRetry,
+    );
   }
 
   String _getCompanyImageUrl() {
@@ -91,7 +181,11 @@ class _LandingScreenState extends State<LandingScreen>
             ],
           ),
         ),
-        child: isLoading ? _buildLoadingScreen() : _buildJobContent(),
+        child: isLoading
+            ? _buildLoadingScreen()
+            : hasError
+            ? _getErrorScreen()
+            : _buildJobContent(),
       ),
     );
   }
@@ -231,7 +325,7 @@ class _LandingScreenState extends State<LandingScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  jobData?['title'] ?? 'Software Engineer',
+                  jobData?['title'] ?? 'Job Position',
                   style: TextStyle(
                     color: ThemeColors.mauve100.color,
                     fontSize: isMobile ? 20 : 24,
@@ -242,7 +336,7 @@ class _LandingScreenState extends State<LandingScreen>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  jobData?['company'] ?? 'Tech Company',
+                  jobData?['company'] ?? 'Company',
                   style: TextStyle(
                     color: ThemeColors.slateGreen200.color,
                     fontSize: isMobile ? 14 : 16,
@@ -338,8 +432,7 @@ class _LandingScreenState extends State<LandingScreen>
                 ),
                 SizedBox(height: isMobile ? 10 : 12),
                 Text(
-                  jobData?['description'] ??
-                      'We are looking for a talented developer to join our team. This is an exciting opportunity to work on cutting-edge projects and grow your career.',
+                  jobData?['description'] ?? 'Job description not available',
                   style: TextStyle(
                     color: ThemeColors.neutral2.color,
                     fontSize: isMobile ? 14 : 16,
@@ -357,7 +450,7 @@ class _LandingScreenState extends State<LandingScreen>
                   children: [
                     _buildInfoChip(
                       Icons.location_on,
-                      jobData?['location'] ?? 'Remote',
+                      jobData?['location'] ?? 'Location not specified',
                       ThemeColors.mauve300.color,
                       ThemeColors.mauve100.color,
                     ),
@@ -368,6 +461,15 @@ class _LandingScreenState extends State<LandingScreen>
                       ThemeColors.slateGreen200.color,
                       ThemeColors.slateGreen100.color,
                     ),
+                    if (jobData?['stipend'] != null) ...[
+                      const SizedBox(height: 8),
+                      _buildInfoChip(
+                        Icons.currency_rupee,
+                        jobData!['stipend'].toString(),
+                        ThemeColors.lime200.color,
+                        ThemeColors.lime100.color,
+                      ),
+                    ],
                   ],
                 )
               : Wrap(
@@ -376,7 +478,7 @@ class _LandingScreenState extends State<LandingScreen>
                   children: [
                     _buildInfoChip(
                       Icons.location_on,
-                      jobData?['location'] ?? 'Remote',
+                      jobData?['location'] ?? 'Location not specified',
                       ThemeColors.mauve300.color,
                       ThemeColors.mauve100.color,
                     ),
@@ -386,6 +488,13 @@ class _LandingScreenState extends State<LandingScreen>
                       ThemeColors.slateGreen200.color,
                       ThemeColors.slateGreen100.color,
                     ),
+                    if (jobData?['stipend'] != null)
+                      _buildInfoChip(
+                        Icons.currency_rupee,
+                        jobData!['stipend'].toString(),
+                        ThemeColors.lime200.color,
+                        ThemeColors.lime100.color,
+                      ),
                   ],
                 ),
         ],
@@ -442,6 +551,7 @@ class _LandingScreenState extends State<LandingScreen>
     return Center(
       child: Container(
         width: isDesktop ? 280 : double.infinity,
+        constraints: const BoxConstraints(maxWidth: 300),
         height: isMobile ? 56 : 60,
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -458,12 +568,14 @@ class _LandingScreenState extends State<LandingScreen>
         ),
         child: ElevatedButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => BasicFormScreen(jobId: jobId!),
-              ),
-            );
+            if (projectHash != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BasicFormScreen(jobId: projectHash!),
+                ),
+              );
+            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,

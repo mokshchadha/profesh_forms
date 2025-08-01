@@ -8,7 +8,10 @@ class UrlUtils {
 
     // Example validation - adjust based on your hash format
     // This assumes hashes are alphanumeric and between 16-64 characters
-    final hashRegex = RegExp(r'^[a-zA-Z0-9]{16,64}$');
+    final hashRegex = RegExp(
+      r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+      caseSensitive: false,
+    );
     return hashRegex.hasMatch(hash);
   }
 

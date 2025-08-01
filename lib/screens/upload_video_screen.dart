@@ -811,36 +811,45 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
 
     // When not showing preview and not processing, show submit button
     if (!_showPreview && !isProcessing) {
-      return SizedBox(
-        width: double.infinity,
-        height: isMobile ? 50 : 60,
-        child: OutlinedButton(
-          onPressed: _skipVideo,
-          style: OutlinedButton.styleFrom(
-            side: BorderSide(color: ThemeColors.mauve300.color, width: 2),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            backgroundColor: ThemeColors.mauve300.color.withValues(alpha: 0.05),
+      return Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: isMobile ? double.infinity : 400,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.check_rounded,
-                color: ThemeColors.mauve300.color,
-                size: isMobile ? 20 : 24,
-              ),
-              SizedBox(width: isMobile ? 8 : 12),
-              Text(
-                'Submit Application',
-                style: TextStyle(
-                  fontSize: isMobile ? 16 : 18,
-                  fontWeight: FontWeight.bold,
-                  color: ThemeColors.mauve300.color,
+          child: SizedBox(
+            width: isMobile ? double.infinity : 400,
+            height: isMobile ? 50 : 60,
+            child: OutlinedButton(
+              onPressed: _skipVideo,
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: ThemeColors.mauve300.color, width: 2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                backgroundColor: ThemeColors.mauve300.color.withValues(
+                  alpha: 0.05,
                 ),
               ),
-            ],
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.check_rounded,
+                    color: ThemeColors.mauve300.color,
+                    size: isMobile ? 20 : 24,
+                  ),
+                  SizedBox(width: isMobile ? 8 : 12),
+                  Text(
+                    'Submit Application',
+                    style: TextStyle(
+                      fontSize: isMobile ? 16 : 18,
+                      fontWeight: FontWeight.bold,
+                      color: ThemeColors.mauve300.color,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       );

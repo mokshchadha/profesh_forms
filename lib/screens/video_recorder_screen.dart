@@ -3,6 +3,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:profesh_forms/constants.dart';
 
+enum RecordingStatus { initial, recording, paused }
+
 class VideoRecorderScreen extends StatefulWidget {
   final String? jobId;
   final String? jobDescription;
@@ -26,7 +28,7 @@ class _VideoRecorderScreenState extends State<VideoRecorderScreen>
   CameraController? _controller;
   XFile? _video;
   int _timer = 0;
-  bool isRecording = false;
+  RecordingStatus _status = RecordingStatus.initial;
   bool _isInitialized = false;
   bool _showJobDescription = true;
   Timer? _recordingTimer;
@@ -42,8 +44,8 @@ class _VideoRecorderScreenState extends State<VideoRecorderScreen>
   late Animation<double> _progressAnimation;
   
   // Constants
-  static const int maxRecordingTime = 10; // 90 seconds
-  
+  static const int maxRecordingTime = 90; // 90 seconds
+
   @override
   void initState() {
     super.initState();
@@ -63,7 +65,7 @@ class _VideoRecorderScreenState extends State<VideoRecorderScreen>
     );
     
     _progressController = AnimationController(
-      duration: Duration(seconds: maxRecordingTime),
+      duration: const Duration(seconds: maxRecordingTime),
       vsync: this,
     );
     
@@ -119,72 +121,89 @@ class _VideoRecorderScreenState extends State<VideoRecorderScreen>
     }
   }
 
-  Future<void> _toggleRecording() async {
-    if (!_controller!.value.isInitialized) return;
-
-    if (!isRecording) {
-      await _startRecording();
-    } else {
-      await _stopRecording();
-    }
-  }
-
   Future<void> _startRecording() async {
-    try {
-      await _controller!.startVideoRecording();
-      
-      setState(() {
-        isRecording = true;
-        _timer = 0;
-        _showJobDescription = false;
-      });
-
-      // Start progress animation
-      _progressController.forward();
-      
-      // Start pulse animation for recording indicator
-      _pulseController.repeat(reverse: true);
-
-      // Start timer
-      _recordingTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        if (mounted) {
-          setState(() {
-            _timer++;
-          });
-
-          if (_timer >= maxRecordingTime) {
-            _stopRecording();
-          }
-        }
-      });
-    } catch (e) {
-      debugPrint('Error starting recording: $e');
+    if (_status == RecordingStatus.initial) {
+      try {
+        await _controller!.startVideoRecording();
+        setState(() {
+          _status = RecordingStatus.recording;
+          _timer = 0;
+          _showJobDescription = false;
+        });
+        _progressController.forward();
+        _pulseController.repeat(reverse: true);
+        _startTimer();
+      } catch (e) {
+        debugPrint('Error starting recording: $e');
+      }
     }
   }
 
-  Future<void> _stopRecording() async {
-    if (!isRecording) return;
-
-    try {
-      final XFile file = await _controller!.stopVideoRecording();
-      
-      setState(() {
-        isRecording = false;
-        _video = file;
-        _timer = 0;
-      });
-
-      _recordingTimer?.cancel();
-      _pulseController.stop();
-      _progressController.reset();
-
-      // Return the recorded video file
-      if (mounted && _video != null) {
-        Navigator.pop(context, XFile(_video!.path));
+  Future<void> _pauseRecording() async {
+    if (_status == RecordingStatus.recording) {
+      try {
+        await _controller!.pauseVideoRecording();
+        setState(() {
+          _status = RecordingStatus.paused;
+        });
+        _recordingTimer?.cancel();
+        _pulseController.stop();
+        _progressController.stop();
+      } catch (e) {
+        debugPrint('Error pausing recording: $e');
       }
-    } catch (e) {
-      debugPrint('Error stopping recording: $e');
     }
+  }
+
+  Future<void> _resumeRecording() async {
+    if (_status == RecordingStatus.paused) {
+      try {
+        await _controller!.resumeVideoRecording();
+        setState(() {
+          _status = RecordingStatus.recording;
+        });
+        _pulseController.repeat(reverse: true);
+        _progressController.forward();
+        _startTimer();
+      } catch (e) {
+        debugPrint('Error resuming recording: $e');
+      }
+    }
+  }
+
+  Future<void> _saveRecording() async {
+    if (_status == RecordingStatus.paused ||
+        _status == RecordingStatus.recording) {
+      try {
+        final XFile file = await _controller!.stopVideoRecording();
+        setState(() {
+          _video = file;
+          _status = RecordingStatus.initial;
+          _timer = 0;
+        });
+        _recordingTimer?.cancel();
+        _pulseController.stop();
+        _progressController.reset();
+        if (mounted && _video != null) {
+          Navigator.pop(context, XFile(_video!.path));
+        }
+      } catch (e) {
+        debugPrint('Error saving recording: $e');
+      }
+    }
+  }
+
+  void _startTimer() {
+    _recordingTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          _timer++;
+        });
+        if (_timer >= maxRecordingTime) {
+          _saveRecording();
+        }
+      }
+    });
   }
 
   void _toggleJobDescription() {
@@ -219,9 +238,12 @@ class _VideoRecorderScreenState extends State<VideoRecorderScreen>
               children: [
                 _buildCameraPreview(),
                 _buildTopOverlay(),
-                if (_showJobDescription && !isRecording) _buildJobDescriptionOverlay(),
+                if (_showJobDescription && _status != RecordingStatus.recording)
+                  _buildJobDescriptionOverlay(),
                 _buildBottomControls(),
-                if (isRecording) _buildRecordingIndicators(),
+                if (_status == RecordingStatus.recording ||
+                    _status == RecordingStatus.paused)
+                  _buildRecordingIndicators(),
               ],
             ),
     );
@@ -298,7 +320,12 @@ class _VideoRecorderScreenState extends State<VideoRecorderScreen>
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: IconButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      if (_controller?.value.isRecordingVideo ?? false) {
+                        _controller!.stopVideoRecording();
+                      }
+                      Navigator.pop(context);
+                    },
                     icon: Icon(
                       Icons.close,
                       color: ThemeColors.neutral1.color,
@@ -333,7 +360,7 @@ class _VideoRecorderScreenState extends State<VideoRecorderScreen>
                     ],
                   ),
                 ),
-                if (!isRecording) ...[
+                if (_status != RecordingStatus.recording) ...[
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.5),
@@ -342,7 +369,9 @@ class _VideoRecorderScreenState extends State<VideoRecorderScreen>
                     child: IconButton(
                       onPressed: _toggleJobDescription,
                       icon: Icon(
-                        _showJobDescription ? Icons.visibility_off : Icons.visibility,
+                        _showJobDescription
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                         color: ThemeColors.mauve300.color,
                         size: 24,
                       ),
@@ -479,6 +508,7 @@ class _VideoRecorderScreenState extends State<VideoRecorderScreen>
   }
 
   Widget _buildRecordingIndicators() {
+    final isRecording = _status == RecordingStatus.recording;
     return Positioned(
       top: 120,
       left: 16,
@@ -489,34 +519,45 @@ class _VideoRecorderScreenState extends State<VideoRecorderScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              AnimatedBuilder(
-                animation: _pulseAnimation,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: _pulseAnimation.value,
-                    child: Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.red.withOpacity(0.5),
-                            blurRadius: 8,
-                            spreadRadius: 2,
-                          ),
-                        ],
-                      ),
+              if (isRecording)
+                AnimatedBuilder(
+                  animation: _pulseAnimation,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: _pulseAnimation.value,
+                      child: child,
+                    );
+                  },
+                  child: Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.red.withOpacity(0.5),
+                          blurRadius: 8,
+                          spreadRadius: 2,
+                        ),
+                      ],
                     ),
-                  );
-                },
-              ),
+                  ),
+                )
+              else
+                Container(
+                  width: 12,
+                  height: 12,
+                  decoration: const BoxDecoration(
+                    color: Colors.grey,
+                    shape: BoxShape.circle,
+                  ),
+                ),
               const SizedBox(width: 8),
               Text(
-                'RECORDING',
+                isRecording ? 'RECORDING' : 'PAUSED',
                 style: TextStyle(
-                  color: Colors.red,
+                  color: isRecording ? Colors.red : Colors.white,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1,
@@ -593,7 +634,7 @@ class _VideoRecorderScreenState extends State<VideoRecorderScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (!isRecording) ...[
+                if (_status == RecordingStatus.initial) ...[
                   Text(
                     'Ensure your entire face is visible & there are no background sounds',
                     style: TextStyle(
@@ -605,39 +646,81 @@ class _VideoRecorderScreenState extends State<VideoRecorderScreen>
                   ),
                   const SizedBox(height: 24),
                 ],
-                
-                // Recording button
-                GestureDetector(
-                  onTap: _toggleRecording,
-                  child: Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 4,
-                      ),
-                      color: Colors.transparent,
-                    ),
-                    child: Center(
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        width: isRecording ? 24 : 60,
-                        height: isRecording ? 24 : 60,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Recording button
+                    GestureDetector(
+                      onTap: () {
+                        if (_status == RecordingStatus.initial) {
+                          _startRecording();
+                        } else if (_status == RecordingStatus.recording) {
+                          _pauseRecording();
+                        } else if (_status == RecordingStatus.paused) {
+                          _resumeRecording();
+                        }
+                      },
+                      child: Container(
+                        width: 80,
+                        height: 80,
                         decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(isRecording ? 4 : 30),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 4),
+                          color: Colors.transparent,
+                        ),
+                        child: Center(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: _status == RecordingStatus.recording
+                                ? 24
+                                : 60,
+                            height: _status == RecordingStatus.recording
+                                ? 24
+                                : 60,
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(
+                                _status == RecordingStatus.recording ? 4 : 30,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                    if (_status == RecordingStatus.paused ||
+                        _status == RecordingStatus.recording) ...[
+                      const SizedBox(width: 20),
+                      GestureDetector(
+                        onTap: _saveRecording,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: ThemeColors.lime500.color,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: const Text(
+                            'Save',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-                
-                if (isRecording) ...[
+                if (_status == RecordingStatus.recording ||
+                    _status == RecordingStatus.paused) ...[
                   const SizedBox(height: 16),
                   Text(
-                    'Tap to stop recording',
+                    _status == RecordingStatus.recording
+                        ? 'Tap to pause recording'
+                        : 'Tap to resume recording',
                     style: TextStyle(
                       color: ThemeColors.neutral3.color,
                       fontSize: 12,

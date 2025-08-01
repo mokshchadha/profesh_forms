@@ -123,7 +123,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
 
     // Simulate upload progress
     for (int i = 0; i <= 100; i += 4) {
-      await Future.delayed(const Duration(milliseconds: 150));
+      await Future.delayed(const Duration(milliseconds: 350));
       if (mounted) {
         setState(() {
           _uploadProgress = i / 100;

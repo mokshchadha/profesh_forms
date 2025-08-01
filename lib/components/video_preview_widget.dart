@@ -1,11 +1,12 @@
 import 'dart:io';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 import 'package:profesh_forms/constants.dart';
 
 class VideoPreviewWidget extends StatefulWidget {
-  final File videoFile;
+  final XFile videoFile;
   final VoidCallback onReselect;
   final VoidCallback? onConfirm;
   final bool showActions;
@@ -46,7 +47,9 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
         _errorMessage = null;
       });
 
-      _videoPlayerController = VideoPlayerController.file(widget.videoFile);
+      _videoPlayerController = VideoPlayerController.networkUrl(
+        Uri.parse(widget.videoFile.path),
+      );
       await _videoPlayerController!.initialize();
 
       _videoDuration = _videoPlayerController!.value.duration;
@@ -68,9 +71,7 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
         placeholder: Container(
           color: Colors.black,
           child: Center(
-            child: CircularProgressIndicator(
-              color: ThemeColors.lime500.color,
-            ),
+            child: CircularProgressIndicator(color: ThemeColors.lime500.color),
           ),
         ),
         errorBuilder: (context, errorMessage) {
@@ -126,9 +127,9 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
     }
   }
 
-  String _getFileSize() {
+  Future<String> _getFileSize() async {
     try {
-      final bytes = widget.videoFile.lengthSync();
+      final bytes = await widget.videoFile.length();
       if (bytes < 1024) {
         return '$bytes B';
       } else if (bytes < 1048576) {
@@ -145,7 +146,7 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
 
   String _formatDuration(Duration? duration) {
     if (duration == null) return 'Unknown';
-    
+
     final minutes = duration.inMinutes;
     final seconds = duration.inSeconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
@@ -194,7 +195,7 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
           // Header with file info
           _buildFileInfo(),
           SizedBox(height: isMobile ? 16 : 20),
-          
+
           // Video Preview
           Container(
             height: isMobile ? 300 : 400,
@@ -211,7 +212,7 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
               child: _buildVideoContent(),
             ),
           ),
-          
+
           if (widget.showActions) ...[
             SizedBox(height: isMobile ? 16 : 20),
             _buildActionButtons(),
@@ -318,16 +319,11 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(
-              color: ThemeColors.lime500.color,
-            ),
+            CircularProgressIndicator(color: ThemeColors.lime500.color),
             const SizedBox(height: 16),
             Text(
               'Loading video...',
-              style: TextStyle(
-                color: ThemeColors.neutral1.color,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: ThemeColors.neutral1.color, fontSize: 14),
             ),
           ],
         ),
@@ -339,11 +335,7 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              color: ThemeColors.red.color,
-              size: 48,
-            ),
+            Icon(Icons.error_outline, color: ThemeColors.red.color, size: 48),
             const SizedBox(height: 16),
             Text(
               'Error loading video',
@@ -356,10 +348,7 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
             const SizedBox(height: 8),
             Text(
               _errorMessage ?? 'Unknown error occurred',
-              style: TextStyle(
-                color: ThemeColors.neutral3.color,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: ThemeColors.neutral3.color, fontSize: 12),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -393,10 +382,7 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
             height: isMobile ? 45 : 50,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: ThemeColors.mauve300.color,
-                width: 2,
-              ),
+              border: Border.all(color: ThemeColors.mauve300.color, width: 2),
             ),
             child: OutlinedButton(
               onPressed: widget.onReselect,
@@ -482,7 +468,7 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ],
     );

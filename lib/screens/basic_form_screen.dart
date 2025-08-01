@@ -32,23 +32,19 @@ class _BasicFormScreenState extends State<BasicFormScreen>
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.2),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-    ));
-    
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
+
     _animationController.forward();
   }
 
@@ -71,6 +67,7 @@ class _BasicFormScreenState extends State<BasicFormScreen>
     final apiService = ApiService();
     final response = await apiService.checkApplicationStatus(
       widget.jobId,
+      _nameController.text,
       _emailController.text,
       _phoneController.text,
     );
@@ -91,6 +88,7 @@ class _BasicFormScreenState extends State<BasicFormScreen>
         ),
       );
     } else {
+      final userId = response['userId'];
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -100,6 +98,7 @@ class _BasicFormScreenState extends State<BasicFormScreen>
               'name': _nameController.text,
               'email': _emailController.text,
               'phone': _phoneController.text,
+              'userId': userId.toString(),
             },
           ),
         ),
@@ -240,13 +239,13 @@ class _BasicFormScreenState extends State<BasicFormScreen>
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: active 
-                ? ThemeColors.lime500.color 
+            color: active
+                ? ThemeColors.lime500.color
                 : ThemeColors.neutral4.color.withValues(alpha: 0.3),
             shape: BoxShape.circle,
             border: Border.all(
-              color: active 
-                  ? ThemeColors.lime200.color 
+              color: active
+                  ? ThemeColors.lime200.color
                   : ThemeColors.neutral4.color,
               width: 2,
             ),
@@ -255,8 +254,8 @@ class _BasicFormScreenState extends State<BasicFormScreen>
             child: Text(
               step.toString(),
               style: TextStyle(
-                color: active 
-                    ? ThemeColors.slateGreen900.color 
+                color: active
+                    ? ThemeColors.slateGreen900.color
                     : ThemeColors.neutral3.color,
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -268,8 +267,8 @@ class _BasicFormScreenState extends State<BasicFormScreen>
         Text(
           label,
           style: TextStyle(
-            color: active 
-                ? ThemeColors.lime200.color 
+            color: active
+                ? ThemeColors.lime200.color
                 : ThemeColors.neutral3.color,
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -285,8 +284,8 @@ class _BasicFormScreenState extends State<BasicFormScreen>
         height: 2,
         margin: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
-          color: active 
-              ? ThemeColors.lime500.color 
+          color: active
+              ? ThemeColors.lime500.color
               : ThemeColors.neutral4.color.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(1),
         ),
@@ -420,11 +419,7 @@ class _BasicFormScreenState extends State<BasicFormScreen>
                 color: ThemeColors.mauve300.color.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(
-                icon, 
-                color: ThemeColors.mauve300.color,
-                size: 20,
-              ),
+              child: Icon(icon, color: ThemeColors.mauve300.color, size: 20),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -436,28 +431,22 @@ class _BasicFormScreenState extends State<BasicFormScreen>
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: ThemeColors.lime500.color, 
+                color: ThemeColors.lime500.color,
                 width: 2,
               ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: ThemeColors.red.color,
-                width: 1.5,
-              ),
+              borderSide: BorderSide(color: ThemeColors.red.color, width: 1.5),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: ThemeColors.red.color, 
-                width: 2,
-              ),
+              borderSide: BorderSide(color: ThemeColors.red.color, width: 2),
             ),
             filled: true,
             fillColor: ThemeColors.slateGreen900.color.withValues(alpha: 0.3),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16, 
+              horizontal: 16,
               vertical: 16,
             ),
             hintText: 'Enter your ${label.toLowerCase()}',
@@ -473,14 +462,11 @@ class _BasicFormScreenState extends State<BasicFormScreen>
 
   Widget _buildSubmitButton() {
     return Container(
-      width: MediaQuery.of(context).size.width > 720 ?280 : double.infinity,
+      width: MediaQuery.of(context).size.width > 720 ? 280 : double.infinity,
       height: 60,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            ThemeColors.lime200.color,
-            ThemeColors.lime500.color,
-          ],
+          colors: [ThemeColors.lime200.color, ThemeColors.lime500.color],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [

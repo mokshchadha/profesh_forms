@@ -1,10 +1,10 @@
-import 'dart:io';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:profesh_forms/constants.dart';
 import 'package:pdfrx/pdfrx.dart';
 
 class PDFPreviewWidget extends StatefulWidget {
-  final File pdfFile;
+  final XFile pdfFile;
   final VoidCallback onReselect;
   final VoidCallback? onConfirm;
   final bool showActions;
@@ -50,9 +50,9 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
     });
   }
 
-  String _getFileSize() {
+  Future<String> _getFileSize() async {
     try {
-      final bytes = widget.pdfFile.lengthSync();
+      final bytes = await widget.pdfFile.length();
       if (bytes < 1024) {
         return '$bytes B';
       } else if (bytes < 1048576) {

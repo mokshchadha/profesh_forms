@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:profesh_forms/constants.dart';
@@ -43,7 +42,7 @@ class _VideoRecorderScreenState extends State<VideoRecorderScreen>
   late Animation<double> _progressAnimation;
   
   // Constants
-  static const int maxRecordingTime = 90; // 90 seconds
+  static const int maxRecordingTime = 10; // 90 seconds
   
   @override
   void initState() {
@@ -181,7 +180,7 @@ class _VideoRecorderScreenState extends State<VideoRecorderScreen>
 
       // Return the recorded video file
       if (mounted && _video != null) {
-        Navigator.pop(context, File(_video!.path));
+        Navigator.pop(context, XFile(_video!.path));
       }
     } catch (e) {
       debugPrint('Error stopping recording: $e');

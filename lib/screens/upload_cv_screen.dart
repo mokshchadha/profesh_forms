@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:profesh_forms/constants.dart';
@@ -27,8 +27,8 @@ class _UploadCVScreenState extends State<UploadCVScreen>
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _rotationAnimation;
-  
-  File? _selectedFile;
+
+  XFile? _selectedFile;
   bool _isUploading = false;
   bool _showPreview = false;
   double _uploadProgress = 0.0;
@@ -40,36 +40,25 @@ class _UploadCVScreenState extends State<UploadCVScreen>
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    
+
     _uploadController = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
     );
-    
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
-    
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.elasticOut,
-    ));
-    
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+    );
+
     _rotationAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _uploadController,
-      curve: Curves.linear,
-    ));
-    
+    ).animate(CurvedAnimation(parent: _uploadController, curve: Curves.linear));
+
     _animationController.forward();
   }
 
@@ -88,7 +77,7 @@ class _UploadCVScreenState extends State<UploadCVScreen>
 
     if (result != null) {
       setState(() {
-        _selectedFile = File(result.files.single.path!);
+        _selectedFile = XFile(result.files.single.path!);
         _showPreview = true;
       });
     }
@@ -122,7 +111,6 @@ class _UploadCVScreenState extends State<UploadCVScreen>
     try {
       final apiService = ApiService();
       final response = await apiService.uploadCV(
-        widget.jobId,
         _selectedFile!,
         widget.userData,
       );
@@ -157,12 +145,12 @@ class _UploadCVScreenState extends State<UploadCVScreen>
     } catch (e) {
       _uploadController.stop();
       _uploadController.reset();
-      
+
       if (mounted) {
         setState(() {
           _isUploading = false;
         });
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error uploading CV: $e'),
@@ -177,10 +165,8 @@ class _UploadCVScreenState extends State<UploadCVScreen>
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => UploadVideoScreen(
-          jobId: widget.jobId,
-          userData: widget.userData,
-        ),
+        builder: (context) =>
+            UploadVideoScreen(jobId: widget.jobId, userData: widget.userData),
       ),
     );
   }
@@ -217,11 +203,11 @@ class _UploadCVScreenState extends State<UploadCVScreen>
                   Expanded(
                     child: ScaleTransition(
                       scale: _scaleAnimation,
-                      child: _isUploading 
+                      child: _isUploading
                           ? _buildUploadProgress()
                           : _showPreview && _selectedFile != null
-                              ? _buildPreviewArea()
-                              : _buildUploadArea(),
+                          ? _buildPreviewArea()
+                          : _buildUploadArea(),
                     ),
                   ),
                   _buildActionButtons(),
@@ -305,38 +291,39 @@ class _UploadCVScreenState extends State<UploadCVScreen>
     );
   }
 
-  Widget _buildProgressStep(int step, String label, bool active, bool completed) {
+  Widget _buildProgressStep(
+    int step,
+    String label,
+    bool active,
+    bool completed,
+  ) {
     return Column(
       children: [
         Container(
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: completed 
+            color: completed
                 ? ThemeColors.lime700.color
-                : active 
-                    ? ThemeColors.lime500.color 
-                    : ThemeColors.neutral4.color.withValues(alpha: 0.3),
+                : active
+                ? ThemeColors.lime500.color
+                : ThemeColors.neutral4.color.withValues(alpha: 0.3),
             shape: BoxShape.circle,
             border: Border.all(
               color: completed || active
-                  ? ThemeColors.lime200.color 
+                  ? ThemeColors.lime200.color
                   : ThemeColors.neutral4.color,
               width: 2,
             ),
           ),
           child: Center(
             child: completed
-                ? Icon(
-                    Icons.check,
-                    color: ThemeColors.neutral1.color,
-                    size: 16,
-                  )
+                ? Icon(Icons.check, color: ThemeColors.neutral1.color, size: 16)
                 : Text(
                     step.toString(),
                     style: TextStyle(
-                      color: active 
-                          ? ThemeColors.slateGreen900.color 
+                      color: active
+                          ? ThemeColors.slateGreen900.color
                           : ThemeColors.neutral3.color,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -349,7 +336,7 @@ class _UploadCVScreenState extends State<UploadCVScreen>
           label,
           style: TextStyle(
             color: (completed || active)
-                ? ThemeColors.lime200.color 
+                ? ThemeColors.lime200.color
                 : ThemeColors.neutral3.color,
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -365,8 +352,8 @@ class _UploadCVScreenState extends State<UploadCVScreen>
         height: 2,
         margin: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
-          color: active 
-              ? ThemeColors.lime500.color 
+          color: active
+              ? ThemeColors.lime500.color
               : ThemeColors.neutral4.color.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(1),
         ),
@@ -464,7 +451,10 @@ class _UploadCVScreenState extends State<UploadCVScreen>
               ),
               const SizedBox(height: 24),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: ThemeColors.lime500.color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -608,12 +598,9 @@ class _UploadCVScreenState extends State<UploadCVScreen>
               width: double.infinity,
               height: 60,
               child: OutlinedButton(
-                onPressed: _skipToVideo, 
+                onPressed: _skipToVideo,
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(
-                    color: ThemeColors.mauve300.color, 
-                    width: 2,
-                  ),
+                  side: BorderSide(color: ThemeColors.mauve300.color, width: 2),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -622,8 +609,8 @@ class _UploadCVScreenState extends State<UploadCVScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.skip_next_rounded, 
-                      color: ThemeColors.mauve300.color, 
+                      Icons.skip_next_rounded,
+                      color: ThemeColors.mauve300.color,
                       size: 24,
                     ),
                     const SizedBox(width: 12),
@@ -643,4 +630,5 @@ class _UploadCVScreenState extends State<UploadCVScreen>
         ],
       ),
     );
-  }}
+  }
+}

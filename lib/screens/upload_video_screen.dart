@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:profesh_forms/components/video_preview_widget.dart';
@@ -29,7 +29,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
   late Animation<double> _scaleAnimation;
   late Animation<double> _rotationAnimation;
 
-  File? _selectedVideo;
+  XFile? _selectedVideo;
   bool _isUploading = false;
   bool _isSubmitting = false;
   bool _showPreview = false;
@@ -76,14 +76,14 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
 
     if (result != null) {
       setState(() {
-        _selectedVideo = File(result.files.single.path!);
+        _selectedVideo = XFile(result.files.single.path!);
         _showPreview = true;
       });
     }
   }
 
   Future<void> _recordVideo() async {
-    final result = await Navigator.push<File>(
+    final result = await Navigator.push<XFile>(
       context,
       MaterialPageRoute(
         builder: (context) => VideoRecorderScreen(
@@ -134,7 +134,6 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
     try {
       final apiService = ApiService();
       final response = await apiService.uploadVideo(
-        widget.jobId,
         _selectedVideo!,
         widget.userData,
       );
@@ -147,12 +146,18 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
           _isUploading = false;
         });
 
-        if (response['success'] == true) {
-          _navigateToSuccessScreen(true);
-        } else {
-          _showErrorSnackBar(
-            'Upload failed: ${response['error'] ?? 'Unknown error'}',
+        if (response == true) {
+          final resp = await apiService.submitApplicationWithoutVideo(
+            widget.jobId,
+            widget.userData,
           );
+          if (resp["success"] == true) {
+            _navigateToSuccessScreen(true);
+          } else {
+            _showErrorSnackBar("Couldn't apply to job : ${resp["message"]}");
+          }
+        } else {
+          _showErrorSnackBar('Upload failed');
         }
       }
     } catch (e) {

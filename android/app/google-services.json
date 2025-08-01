@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1029058971251",
+    "project_id": "profeshv2",
+    "storage_bucket": "profeshv2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1029058971251:android:4aeda5b5533b9216ac4c06",
+        "android_client_info": {
+          "package_name": "com.campuscareers.profesh"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgyTidXqrgBnmQ-vmprS2Y5QRf3JlXFpI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1029058971251:android:2f803e29f5c63ce0ac4c06",
+        "android_client_info": {
+          "package_name": "com.example.profesh_forms"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgyTidXqrgBnmQ-vmprS2Y5QRf3JlXFpI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,56 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "profeshv2",
+          "appId": "1:1029058971251:android:2f803e29f5c63ce0ac4c06",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "profeshv2",
+          "appId": "1:1029058971251:ios:726000e0895d0ba0ac4c06",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "macos": {
+        "default": {
+          "projectId": "profeshv2",
+          "appId": "1:1029058971251:ios:726000e0895d0ba0ac4c06",
+          "uploadDebugSymbols": false,
+          "fileOutput": "macos/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "profeshv2",
+          "configurations": {
+            "android": "1:1029058971251:android:2f803e29f5c63ce0ac4c06",
+            "ios": "1:1029058971251:ios:726000e0895d0ba0ac4c06",
+            "macos": "1:1029058971251:ios:726000e0895d0ba0ac4c06",
+            "web": "1:1029058971251:web:3a4d302ebe7b4f3eac4c06",
+            "windows": "1:1029058971251:web:50a7e59011704104ac4c06"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "site": "profeshform",
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

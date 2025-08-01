@@ -1,11 +1,11 @@
 {
-    "name": "profesh_forms",
-    "short_name": "profesh_forms",
+    "name": "Profesh Forms",
+    "short_name": "Profesh",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Profesh - your one stop hiring solution!",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

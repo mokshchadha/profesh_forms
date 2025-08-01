@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
@@ -19,18 +20,18 @@ class ApiService {
       final response = await getRequest(url);
 
       if (response['error'] == null) {
+        final res = response['data'];
         return {
           'success': true,
-          'title': response['projectName'] ?? 'Job Position',
-          'company': response['companyName'] ?? 'Company',
-          'description':
-              response['description'] ?? 'Job description not available',
-          'location': response['location'] ?? 'Location not specified',
-          'type': response['type'] ?? 'Full-time',
-          'stipend': response['stipend'],
+          'title': res['projectName'] ?? 'Job Position',
+          'company': res['companyName'] ?? 'Company',
+          'description': res['jobBrief'] ?? 'Job description not available',
+          'location': res['location'] ?? 'Location not specified',
+          'type': res['type'] ?? 'Full-time',
+          'stipend': res['stipend'],
           'logo': response['logo'],
           'videoUrl': response['videoUrl'] ?? '',
-          'jdPdf': response['jdPdf'] ?? '',
+          'jdPdf': response['jdUrl'] ?? '',
         };
       } else {
         debugPrint('Error getting job details: ${response['error']}');
@@ -44,20 +45,39 @@ class ApiService {
 
   Future<dynamic> checkApplicationStatus(
     String projectHash,
+    String name,
     String email,
     String phone,
   ) async {
+    String firstName, lastName;
+    name = name.trim();
+    int firstSpaceIndex = name.indexOf(' ');
+    if (firstSpaceIndex != -1) {
+      firstName = name.substring(0, firstSpaceIndex);
+      lastName = name.substring(firstSpaceIndex + 1);
+    } else {
+      firstName = name;
+      lastName = '';
+    }
     try {
-      final url = '$baseUrl/$apiV1/candidates/public-form-application';
-      final body = {'email': email, 'phone': phone};
+      final url = '$baseUrl/$apiV1/candidate/public-form-application';
+      final body = {
+        'projectHash': projectHash,
+        'firstName': firstName,
+        'lastName': lastName,
+        'email': email,
+        'phone': phone,
+        'countryCode': "+91",
+      };
 
       final response = await postRequest(url, body);
 
       if (response['error'] == null) {
+        final res = response['data'];
         return {
           'success': true,
-          'alreadyApplied': response['isApplied'] ?? false,
-          'userId': response['userId'],
+          'alreadyApplied': res['isApplied'] ?? false,
+          'userId': res['userId'],
           'message': response['isApplied'] == true
               ? 'You have already applied for this position'
               : 'You can proceed with the application',
@@ -72,13 +92,11 @@ class ApiService {
     }
   }
 
-  Future<dynamic> uploadCV(
-    String projectHash,
-    File cvFile,
-    Map<String, String> userData,
-  ) async {
+  Future<dynamic> uploadCV(XFile cvFile, Map<String, String> userData) async {
     try {
-      final uploadUrl = '$baseUrl/$apiV1/upload/resume';
+      final uploadUrl =
+          '$serverUrl/$apiV1/user/${userData["userId"]}/public-resume';
+      ;
       final uploadResponse = await multipartRequestFile(
         uploadUrl,
         cvFile,
@@ -88,7 +106,10 @@ class ApiService {
       if (uploadResponse['error'] == null) {
         final resumeUrl = uploadResponse['url'] ?? uploadResponse['fileUrl'];
 
-        await LocalStorageService().setData('resumeUrl', resumeUrl);
+        await LocalStorageService().setData(
+          'resumeUrl',
+          'https://example.com/cv/${DateTime.now().millisecondsSinceEpoch}.pdf',
+        );
 
         return {
           'success': true,
@@ -104,63 +125,57 @@ class ApiService {
     }
   }
 
-  Future<dynamic> uploadVideo(
-    String projectHash,
-    File videoFile,
+  Future<bool> uploadVideo(
+    XFile videoFile,
     Map<String, String> userData,
   ) async {
     try {
-      final uploadUrl = '$baseUrl/$apiV1/upload/video';
-      final uploadResponse = await multipartRequestVideo(
-        uploadUrl,
-        videoFile,
-        'video',
-      );
-
-      if (uploadResponse['error'] == null) {
-        final videoUrl = uploadResponse['url'] ?? uploadResponse['fileUrl'];
-
-        final applicationResult = await _submitCompleteApplication(
-          projectHash,
-          userData,
-          videoUrl,
+      if (videoFile.path == null) {
+        return false;
+      }
+      final endpoint =
+          '$serverUrl/$apiV1/user/${userData["userId"]}/public-video';
+      final fileSize = await videoFile.length();
+      final mimeType = 'video/webm';
+      final cleanMimeType = mimeType.split(';').first;
+      final extension = cleanMimeType.split('/').last;
+      final resp = await postRequest(endpoint, {
+        "fileName": "${videoFile.path.split('/').last}.$extension",
+        "fileSize": fileSize,
+      });
+      print(resp);
+      if (resp['success'] == true) {
+        final response = await multipartRequestWebVideo(
+          resp["data"],
+          videoFile,
+          'videoResume',
         );
-
-        return applicationResult;
-      } else {
-        return {'success': false, 'error': uploadResponse['error']};
+        if (response['error'] == null) return true;
       }
     } catch (e) {
-      debugPrint('Exception in uploadVideo: $e');
-      return {'success': false, 'error': 'Failed to upload video'};
+      print("Error in uploadVideoResume");
+      print(e);
     }
+    return false;
   }
 
   Future<dynamic> submitApplicationWithoutVideo(
     String projectHash,
     Map<String, String> userData,
   ) async {
-    return await _submitCompleteApplication(projectHash, userData, null);
+    return await _submitCompleteApplication(projectHash, userData);
   }
 
   Future<dynamic> _submitCompleteApplication(
     String projectHash,
     Map<String, String> userData,
-    String? videoUrl,
   ) async {
     try {
-      final url = '$baseUrl/$apiV1/apply/$projectHash';
+      final url = '$baseUrl/$apiV1/project/apply/$projectHash';
       final localStorage = LocalStorageService();
       final resumeUrl = await localStorage.getData('resumeUrl');
 
-      final body = {
-        'firstName': userData['name']?.split(' ').first ?? '',
-        'lastName': userData['name']?.split(' ').skip(1).join(' ') ?? '',
-        'email': userData['email'] ?? '',
-        'phone': userData['phone'] ?? '',
-        if (resumeUrl != null) 'resumeUrl': resumeUrl,
-        if (videoUrl != null) 'videoUrl': videoUrl,
-      };
+      final body = {'userId': userData["userId"]};
 
       final response = await postRequest(url, body);
 
@@ -293,7 +308,7 @@ class ApiService {
 
   Future<dynamic> multipartRequestFile(
     String url,
-    File file,
+    XFile file,
     String fileType,
   ) async {
     try {
@@ -301,40 +316,63 @@ class ApiService {
       final uri = Uri.parse(url);
       final request = http.MultipartRequest('POST', uri);
       request.headers.addAll(headers);
-      final mimeType = lookupMimeType(file.path);
-      if (mimeType == null) {
-        debugPrint('Error: Could not determine the MIME type.');
-        return {'error': 'Could not determine file type'};
-      }
-      final mimeTypeParts = mimeType.split('/');
-      final mediaType = MediaType(mimeTypeParts[0], mimeTypeParts[1]);
+      final mediaType = MediaType('application', 'pdf');
+      final fileBytes = await file.readAsBytes();
+
       request.files.add(
-        await http.MultipartFile.fromPath(
+        await http.MultipartFile.fromBytes(
           fileType,
-          file.path,
+          fileBytes,
+          filename: "${file.path.split('/').last}.pdf",
           contentType: mediaType,
         ),
       );
 
-      final response = await request.send();
+      http.StreamedResponse response = await request.send();
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 200) {
         final responseBody = await http.Response.fromStream(response);
         final res = json.decode(responseBody.body);
         return res;
       } else {
-        debugPrint(
-          'Error in multipart request API call: $url - Status: ${response.statusCode}',
-        );
+        debugPrint('Error in multipart request API call: $url');
         final responseBody = await http.Response.fromStream(response);
         return {
-          'error': 'Failed to upload file',
+          'error': 'Failed to upload image',
           'statusCode': response.statusCode,
           'responseBody': responseBody.body,
         };
       }
     } catch (e) {
-      debugPrint('Error in multipart request code: $url - Exception: $e');
+      debugPrint('Error in multipart request code: $url');
+
+      return {'error': e.toString()};
+    }
+  }
+
+  Future<dynamic> multipartRequestWebVideo(
+    String url,
+    XFile videoFile,
+    String fileType,
+  ) async {
+    try {
+      final uri = Uri.parse(url);
+      final bodyBytes = await videoFile.readAsBytes();
+      var headers = await addHeaders(isMultiPart: true, isStream: true);
+      headers['Content-Length'] = bodyBytes.length.toString();
+      final response = await http.put(uri, body: await videoFile.readAsBytes());
+      if (response.statusCode == 200) {
+        final res = {"success": true};
+        return res;
+      } else {
+        print('Error uploading video: ${response.statusCode}');
+        return {
+          'error': 'Failed to upload video',
+          'statusCode': response.statusCode,
+        };
+      }
+    } catch (e) {
+      print('Error in multipart request:');
       return {'error': e.toString()};
     }
   }

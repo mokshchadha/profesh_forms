@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:profesh_forms/constants.dart';
-import 'package:profesh_forms/screens/already_applied_screen.dart';
-import 'package:profesh_forms/screens/video_recorder_screen.dart';
 import 'screens/landing_screen.dart';
 
 void main() {

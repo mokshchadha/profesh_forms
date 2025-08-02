@@ -108,9 +108,9 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header with file info
-          _buildFileInfo(),
+          // _buildFileInfo(),
           SizedBox(height: isMobile ? 16 : 20),
-          
+
           // PDF Preview
           Container(
             height: isMobile ? 400 : 500,
@@ -127,7 +127,7 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
               child: _buildPDFContent(),
             ),
           ),
-          
+
           if (widget.showActions) ...[
             SizedBox(height: isMobile ? 16 : 20),
             _buildActionButtons(),
@@ -221,16 +221,11 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(
-              color: ThemeColors.lime500.color,
-            ),
+            CircularProgressIndicator(color: ThemeColors.lime500.color),
             const SizedBox(height: 16),
             Text(
               'Loading PDF...',
-              style: TextStyle(
-                color: ThemeColors.neutral4.color,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: ThemeColors.neutral4.color, fontSize: 14),
             ),
           ],
         ),
@@ -242,11 +237,7 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              color: ThemeColors.red.color,
-              size: 48,
-            ),
+            Icon(Icons.error_outline, color: ThemeColors.red.color, size: 48),
             const SizedBox(height: 16),
             Text(
               'Error loading PDF',
@@ -259,17 +250,11 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
             const SizedBox(height: 8),
             Text(
               _errorMessage ?? 'Unknown error occurred',
-              style: TextStyle(
-                color: ThemeColors.neutral4.color,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: ThemeColors.neutral4.color, fontSize: 12),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _loadPDF,
-              child: const Text('Retry'),
-            ),
+            ElevatedButton(onPressed: _loadPDF, child: const Text('Retry')),
           ],
         ),
       );
@@ -281,26 +266,29 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
         controller: _pdfViewerController,
         params: PdfViewerParams(
           // Show loading indicator
-          loadingBannerBuilder: (context, bytesDownloaded, totalBytes) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(
-                  color: ThemeColors.lime500.color,
-                  value: totalBytes != null ? bytesDownloaded / totalBytes : null,
+          loadingBannerBuilder: (context, bytesDownloaded, totalBytes) =>
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      color: ThemeColors.lime500.color,
+                      value: totalBytes != null
+                          ? bytesDownloaded / totalBytes
+                          : null,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Loading PDF...',
+                      style: TextStyle(
+                        color: ThemeColors.neutral4.color,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  'Loading PDF...',
-                  style: TextStyle(
-                    color: ThemeColors.neutral4.color,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
+              ),
+
           // Set background color
           backgroundColor: ThemeColors.neutral1.color,
         ),
@@ -327,10 +315,7 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
             const SizedBox(height: 8),
             Text(
               'File selected successfully',
-              style: TextStyle(
-                color: ThemeColors.neutral4.color,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: ThemeColors.neutral4.color, fontSize: 12),
             ),
           ],
         ),
@@ -349,16 +334,15 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
             height: isMobile ? 45 : 50,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: ThemeColors.mauve300.color,
-                width: 2,
-              ),
+              border: Border.all(color: ThemeColors.mauve300.color, width: 2),
             ),
             child: OutlinedButton(
               onPressed: widget.onReselect,
               style: OutlinedButton.styleFrom(
                 side: BorderSide.none,
-                backgroundColor: ThemeColors.mauve300.color.withValues(alpha: 0.05),
+                backgroundColor: ThemeColors.mauve300.color.withValues(
+                  alpha: 0.05,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -373,9 +357,9 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
                   ),
                   SizedBox(width: isMobile ? 6 : 8),
                   Text(
-                    'Choose Different',
+                    'Reupload',
                     style: TextStyle(
-                      fontSize: isMobile ? 14 : 16,
+                      fontSize: isMobile ? 12 : 16,
                       fontWeight: FontWeight.w600,
                       color: ThemeColors.mauve300.color,
                     ),

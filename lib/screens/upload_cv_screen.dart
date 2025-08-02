@@ -373,6 +373,8 @@ class _UploadCVScreenState extends State<UploadCVScreen>
   }
 
   Widget _buildUploadArea() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth <= 600;
     return Center(
       child: GestureDetector(
         onTap: _isUploading ? null : _pickFile,
@@ -426,7 +428,7 @@ class _UploadCVScreenState extends State<UploadCVScreen>
                 'Upload Your CV',
                 style: TextStyle(
                   color: ThemeColors.neutral1.color,
-                  fontSize: 24,
+                  fontSize: isMobile ? 16 : 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -435,7 +437,7 @@ class _UploadCVScreenState extends State<UploadCVScreen>
                 'Drag and drop your CV or click to browse',
                 style: TextStyle(
                   color: ThemeColors.slateGreen200.color,
-                  fontSize: 16,
+                  fontSize: isMobile ? 12 : 16,
                   fontWeight: FontWeight.w500,
                 ),
                 textAlign: TextAlign.center,
@@ -445,7 +447,7 @@ class _UploadCVScreenState extends State<UploadCVScreen>
                 'Supported formats: PDF, DOC, DOCX',
                 style: TextStyle(
                   color: ThemeColors.neutral3.color,
-                  fontSize: 14,
+                  fontSize: isMobile ? 11 : 14,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -476,7 +478,7 @@ class _UploadCVScreenState extends State<UploadCVScreen>
                       'Choose File',
                       style: TextStyle(
                         color: ThemeColors.lime200.color,
-                        fontSize: 16,
+                        fontSize: isMobile ? 12 : 16,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

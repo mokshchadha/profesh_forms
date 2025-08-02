@@ -165,7 +165,7 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header with file info
-          _buildFileInfo(),
+          // _buildFileInfo(),
           SizedBox(height: isMobile ? 16 : 20),
 
           // Video Preview
@@ -323,9 +323,9 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
                   ),
                   SizedBox(width: isMobile ? 6 : 8),
                   Text(
-                    'Choose Different',
+                    'Reupload',
                     style: TextStyle(
-                      fontSize: isMobile ? 11 : 16,
+                      fontSize: isMobile ? 10 : 16,
                       fontWeight: FontWeight.w600,
                       color: ThemeColors.mauve300.color,
                     ),

@@ -592,41 +592,42 @@ class _UploadCVScreenState extends State<UploadCVScreen>
           if (_showPreview && _selectedFile != null && !_isUploading) ...[
             // Action buttons are now handled by the PDFPreviewWidget
             const SizedBox.shrink(),
-          ] else if (!_showPreview && !_isUploading) ...[
-            // Show skip button when no file is selected
-            SizedBox(
-              width: double.infinity,
-              height: 60,
-              child: OutlinedButton(
-                onPressed: _skipToVideo,
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: ThemeColors.mauve300.color, width: 2),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.skip_next_rounded,
-                      color: ThemeColors.mauve300.color,
-                      size: 24,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Skip & Continue',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: ThemeColors.mauve300.color,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ],
+          // else if (!_showPreview && !_isUploading) ...[
+          //   // Show skip button when no file is selected
+          //   SizedBox(
+          //     width: double.infinity,
+          //     height: 60,
+          //     child: OutlinedButton(
+          //       onPressed: _skipToVideo,
+          //       style: OutlinedButton.styleFrom(
+          //         side: BorderSide(color: ThemeColors.mauve300.color, width: 2),
+          //         shape: RoundedRectangleBorder(
+          //           borderRadius: BorderRadius.circular(20),
+          //         ),
+          //       ),
+          //       child: Row(
+          //         mainAxisAlignment: MainAxisAlignment.center,
+          //         children: [
+          //           Icon(
+          //             Icons.skip_next_rounded,
+          //             color: ThemeColors.mauve300.color,
+          //             size: 24,
+          //           ),
+          //           const SizedBox(width: 12),
+          //           Text(
+          //             'Skip & Continue',
+          //             style: TextStyle(
+          //               fontSize: 18,
+          //               fontWeight: FontWeight.bold,
+          //               color: ThemeColors.mauve300.color,
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ]
         ],
       ),
     );

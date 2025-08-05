@@ -31,7 +31,6 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
   bool _isInitializing = true;
   bool _hasError = false;
   String? _errorMessage;
-  Duration? _videoDuration;
 
   @override
   void initState() {
@@ -52,21 +51,19 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
       );
       await _videoPlayerController!.initialize();
 
-      _videoDuration = _videoPlayerController!.value.duration;
-
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController!,
         autoPlay: widget.autoPlay,
         looping: false,
-        allowFullScreen: true,
+        allowFullScreen: false,
         allowMuting: true,
         allowPlaybackSpeedChanging: false,
         showControls: true,
         materialProgressColors: ChewieProgressColors(
           playedColor: ThemeColors.lime500.color,
           handleColor: ThemeColors.lime200.color,
-          backgroundColor: ThemeColors.neutral4.color.withOpacity(0.3),
-          bufferedColor: ThemeColors.slateGreen200.color.withOpacity(0.5),
+          backgroundColor: ThemeColors.neutral4.color.withValues(alpha: 0.3),
+          bufferedColor: ThemeColors.slateGreen200.color.withValues(alpha: 0.5),
         ),
         placeholder: Container(
           color: Colors.black,
@@ -127,31 +124,6 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
     }
   }
 
-  Future<String> _getFileSize() async {
-    try {
-      final bytes = await widget.videoFile.length();
-      if (bytes < 1024) {
-        return '$bytes B';
-      } else if (bytes < 1048576) {
-        return '${(bytes / 1024).toStringAsFixed(1)} KB';
-      } else if (bytes < 1073741824) {
-        return '${(bytes / 1048576).toStringAsFixed(1)} MB';
-      } else {
-        return '${(bytes / 1073741824).toStringAsFixed(1)} GB';
-      }
-    } catch (e) {
-      return 'Unknown size';
-    }
-  }
-
-  String _formatDuration(Duration? duration) {
-    if (duration == null) return 'Unknown';
-
-    final minutes = duration.inMinutes;
-    final seconds = duration.inSeconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-  }
-
   @override
   void dispose() {
     _chewieController?.dispose();
@@ -172,18 +144,18 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            ThemeColors.neutral1.color.withOpacity(0.08),
-            ThemeColors.slateGreen100.color.withOpacity(0.05),
+            ThemeColors.neutral1.color.withValues(alpha: 0.08),
+            ThemeColors.slateGreen100.color.withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: ThemeColors.lime500.color.withOpacity(0.3),
+          color: ThemeColors.lime500.color.withValues(alpha: 0.3),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: ThemeColors.black.color.withOpacity(0.3),
+            color: ThemeColors.black.color.withValues(alpha: 0.3),
             blurRadius: 15,
             offset: const Offset(0, 6),
           ),
@@ -203,7 +175,7 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
               color: Colors.black,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: ThemeColors.slateGreen200.color.withOpacity(0.3),
+                color: ThemeColors.slateGreen200.color.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -223,79 +195,25 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
   }
 
   Widget _buildFileInfo() {
-    final fileName = widget.videoFile.path.split('/').last;
-    final fileSize = _getFileSize();
-    final duration = _formatDuration(_videoDuration);
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ThemeColors.slateGreen900.color.withOpacity(0.3),
+        color: ThemeColors.slateGreen900.color.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: ThemeColors.slateGreen200.color.withOpacity(0.2),
+          color: ThemeColors.slateGreen200.color.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: ThemeColors.lime500.color.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              Icons.videocam,
-              color: ThemeColors.lime500.color,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  fileName,
-                  style: TextStyle(
-                    color: ThemeColors.neutral1.color,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Text(
-                      'Size: $fileSize',
-                      style: TextStyle(
-                        color: ThemeColors.neutral3.color,
-                        fontSize: 12,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Duration: $duration',
-                      style: TextStyle(
-                        color: ThemeColors.neutral3.color,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: ThemeColors.lime500.color.withOpacity(0.1),
+              color: ThemeColors.lime500.color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
-                color: ThemeColors.lime500.color.withOpacity(0.3),
+                color: ThemeColors.lime500.color.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -388,7 +306,9 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
               onPressed: widget.onReselect,
               style: OutlinedButton.styleFrom(
                 side: BorderSide.none,
-                backgroundColor: ThemeColors.mauve300.color.withOpacity(0.05),
+                backgroundColor: ThemeColors.mauve300.color.withValues(
+                  alpha: 0.05,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -405,7 +325,7 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
                   Text(
                     'Choose Different',
                     style: TextStyle(
-                      fontSize: isMobile ? 14 : 16,
+                      fontSize: isMobile ? 11 : 16,
                       fontWeight: FontWeight.w600,
                       color: ThemeColors.mauve300.color,
                     ),
@@ -430,7 +350,7 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: ThemeColors.lime500.color.withOpacity(0.3),
+                    color: ThemeColors.lime500.color.withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),

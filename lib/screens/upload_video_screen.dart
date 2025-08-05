@@ -121,49 +121,59 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
 
     _uploadController.repeat();
 
-    // Simulate upload progress
-    for (int i = 0; i <= 100; i += 4) {
-      await Future.delayed(const Duration(milliseconds: 350));
-      if (mounted) {
-        setState(() {
-          _uploadProgress = i / 100;
-        });
-      }
-    }
-
     try {
       final apiService = ApiService();
-      final response = await apiService.uploadVideo(
+      final uploadFuture = apiService.uploadVideo(
         _selectedVideo!,
         widget.userData,
       );
 
+      // Animate progress to 90% max
+      for (int i = 0; i <= 90; i += 4) {
+        await Future.delayed(const Duration(milliseconds: 150));
+        if (!mounted) return;
+        setState(() {
+          _uploadProgress = i / 100;
+        });
+      }
+
+      // Wait for actual API response
+      final response = await uploadFuture;
+
+      if (!mounted) return;
+
+      // Once upload completes, animate to 100%
+      for (int i = 91; i <= 100; i += 3) {
+        await Future.delayed(const Duration(milliseconds: 60));
+        if (!mounted) return;
+        setState(() {
+          _uploadProgress = i / 100;
+        });
+      }
+
       _uploadController.stop();
       _uploadController.reset();
 
-      if (mounted) {
-        setState(() {
-          _isUploading = false;
-        });
+      setState(() {
+        _isUploading = false;
+      });
 
-        if (response == true) {
-          final resp = await apiService.submitApplicationWithoutVideo(
-            widget.jobId,
-            widget.userData,
-          );
-          if (resp["success"] == true) {
-            _navigateToSuccessScreen(true);
-          } else {
-            _showErrorSnackBar("Couldn't apply to job : ${resp["message"]}");
-          }
+      if (response == true) {
+        final resp = await apiService.submitApplicationWithoutVideo(
+          widget.jobId,
+          widget.userData,
+        );
+        if (resp["success"] == true) {
+          _navigateToSuccessScreen(true);
         } else {
-          _showErrorSnackBar('Upload failed');
+          _showErrorSnackBar("Couldn't apply to job : ${resp["message"]}");
         }
+      } else {
+        _showErrorSnackBar('Upload failed');
       }
     } catch (e) {
       _uploadController.stop();
       _uploadController.reset();
-
       if (mounted) {
         setState(() {
           _isUploading = false;
@@ -811,36 +821,45 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
 
     // When not showing preview and not processing, show submit button
     if (!_showPreview && !isProcessing) {
-      return SizedBox(
-        width: double.infinity,
-        height: isMobile ? 50 : 60,
-        child: OutlinedButton(
-          onPressed: _skipVideo,
-          style: OutlinedButton.styleFrom(
-            side: BorderSide(color: ThemeColors.mauve300.color, width: 2),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            backgroundColor: ThemeColors.mauve300.color.withValues(alpha: 0.05),
+      return Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: isMobile ? double.infinity : 400,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.check_rounded,
-                color: ThemeColors.mauve300.color,
-                size: isMobile ? 20 : 24,
-              ),
-              SizedBox(width: isMobile ? 8 : 12),
-              Text(
-                'Submit Application',
-                style: TextStyle(
-                  fontSize: isMobile ? 16 : 18,
-                  fontWeight: FontWeight.bold,
-                  color: ThemeColors.mauve300.color,
+          child: SizedBox(
+            width: isMobile ? double.infinity : 400,
+            height: isMobile ? 50 : 60,
+            child: OutlinedButton(
+              onPressed: _skipVideo,
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: ThemeColors.mauve300.color, width: 2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                backgroundColor: ThemeColors.mauve300.color.withValues(
+                  alpha: 0.05,
                 ),
               ),
-            ],
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.check_rounded,
+                    color: ThemeColors.mauve300.color,
+                    size: isMobile ? 20 : 24,
+                  ),
+                  SizedBox(width: isMobile ? 8 : 12),
+                  Text(
+                    'Submit Application',
+                    style: TextStyle(
+                      fontSize: isMobile ? 16 : 18,
+                      fontWeight: FontWeight.bold,
+                      color: ThemeColors.mauve300.color,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       );

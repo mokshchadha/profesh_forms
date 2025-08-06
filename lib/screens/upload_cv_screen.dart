@@ -161,16 +161,6 @@ class _UploadCVScreenState extends State<UploadCVScreen>
     }
   }
 
-  Future<void> _skipToVideo() async {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            UploadVideoScreen(jobId: widget.jobId, userData: widget.userData),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -442,7 +432,7 @@ class _UploadCVScreenState extends State<UploadCVScreen>
               ),
               const SizedBox(height: 8),
               Text(
-                'Supported formats: PDF, DOC, DOCX',
+                'Supported formats: PDF,',
                 style: TextStyle(
                   color: ThemeColors.neutral3.color,
                   fontSize: 14,

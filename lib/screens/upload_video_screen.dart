@@ -246,7 +246,6 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 600;
 
@@ -522,7 +521,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
           ),
           SizedBox(height: isMobile ? 16 : 24),
           Text(
-            'Add Video Resume',
+            'Add your Video Resume',
             style: TextStyle(
               color: ThemeColors.neutral1.color,
               fontSize: isMobile ? 20 : 24,
@@ -539,15 +538,7 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
             ),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: isMobile ? 4 : 8),
-          Text(
-            'Optional but highly recommended',
-            style: TextStyle(
-              color: ThemeColors.neutral3.color,
-              fontSize: isMobile ? 12 : 14,
-            ),
-            textAlign: TextAlign.center,
-          ),
+
           SizedBox(height: isMobile ? 16 : 24),
           _buildVideoTips(),
           SizedBox(height: isMobile ? 16 : 24),
@@ -643,9 +634,15 @@ class _UploadVideoScreenState extends State<UploadVideoScreen>
     final isMobile = screenWidth <= 600;
 
     final tips = [
-      {'icon': Icons.timer, 'text': 'Keep it under 90 seconds'},
-      {'icon': Icons.lightbulb_outline, 'text': 'Good lighting & clear audio'},
-      {'icon': Icons.person_outline, 'text': 'Be yourself and smile'},
+      {'icon': Icons.timer, 'text': ' Time limit: 90 seconds - plan well'},
+      {
+        'icon': Icons.lightbulb_outline,
+        'text': 'Good lighting + clear audio = win',
+      },
+      {
+        'icon': Icons.person_outline,
+        'text': 'Look sharp. Sound real. Own it. 😄',
+      },
     ];
 
     return Container(

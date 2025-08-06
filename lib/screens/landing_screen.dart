@@ -1,4 +1,7 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:profesh_forms/components/pdf_preview_widget.dart';
+import 'package:profesh_forms/components/video_preview_widget.dart';
 import 'package:profesh_forms/constants.dart';
 import '../services/api_service.dart';
 import '../utils/url_utils.dart';
@@ -26,6 +29,7 @@ class _LandingScreenState extends State<LandingScreen>
   String? errorMessage;
   String? projectHash;
   int? statusCode;
+  bool showJobDescription = false;
 
   @override
   void initState() {
@@ -99,6 +103,12 @@ class _LandingScreenState extends State<LandingScreen>
     }
   }
 
+  void _toggleJobDescription() {
+    setState(() {
+      showJobDescription = !showJobDescription;
+    });
+  }
+
   String? _extractHashFromUrl() {
     try {
       final hash = UrlUtils.extractHashFromUrl();
@@ -155,6 +165,9 @@ class _LandingScreenState extends State<LandingScreen>
   }
 
   String _getCompanyImageUrl() {
+    if (jobData != null && jobData!['logo'] != null) {
+      return jobData!['logo'];
+    }
     if (jobData != null && jobData!['company'] != null) {
       final companyName = jobData!['company'] as String;
       return 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(companyName)}&background=B3F00D&color=2A4B4E&size=200&rounded=true&bold=true';
@@ -230,7 +243,7 @@ class _LandingScreenState extends State<LandingScreen>
     return SafeArea(
       child: Center(
         child: Container(
-          width: isDesktop ? 800 : double.infinity,
+          width: isDesktop ? screenWidth * 0.8 : double.infinity,
           child: SingleChildScrollView(
             child: FadeTransition(
               opacity: _fadeAnimation,
@@ -238,17 +251,82 @@ class _LandingScreenState extends State<LandingScreen>
                 position: _slideAnimation,
                 child: Padding(
                   padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildTopSection(),
-                      SizedBox(height: isMobile ? 24 : 40),
-                      _buildJobCard(),
-                      SizedBox(height: isMobile ? 24 : 40),
-                      _buildApplyButton(),
-                      if (isDesktop) const SizedBox(height: 40),
-                    ],
-                  ),
+                  child: isDesktop
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _buildTopSection(),
+                                  SizedBox(height: 40),
+                                  _buildJobCard(),
+                                  SizedBox(height: 40),
+                                  _buildApplyButton(),
+                                  _buildProfeshBranding(),
+                                  if (isDesktop) const SizedBox(height: 40),
+                                ],
+                              ),
+                            ),
+                            if (jobData?['videoUrl']?.isNotEmpty == true) ...[
+                              SizedBox(width: 30),
+                              SizedBox(
+                                width: 300,
+                                child: VideoPreviewWidget(
+                                  videoFile: XFile(""),
+                                  onReselect: () {},
+                                  onConfirm: () {},
+                                  showActions: false,
+                                  videoUrl: jobData?['videoUrl'],
+                                  hideFileInfo: true,
+                                  isJobVideo: true,
+                                ),
+                              ),
+                            ],
+                          ],
+                        )
+                      : (jobData?['videoUrl']?.isNotEmpty == true)
+                      ? Column(
+                          children: [
+                            _buildTopSection(),
+                            SizedBox(height: 24),
+                            Stack(
+                              children: [
+                                VideoPreviewWidget(
+                                  videoFile: XFile(""),
+                                  onReselect: () {},
+                                  onConfirm: () {},
+                                  showActions: false,
+                                  videoUrl: jobData?['videoUrl'],
+                                  hideFileInfo: true,
+                                  isJobVideo: true,
+                                ),
+                                if (!showJobDescription) ...[
+                                  _buildJobDetailsButton(),
+                                ],
+
+                                if (showJobDescription) ...[
+                                  _buildJobDetailsOverlay(),
+                                ],
+                              ],
+                            ),
+                            SizedBox(height: 24),
+                            _buildApplyButton(),
+                            SizedBox(height: 16),
+                            _buildProfeshBranding(),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            _buildTopSection(),
+                            SizedBox(height: 24),
+                            _buildJobCard(),
+                            SizedBox(height: 24),
+                            _buildApplyButton(),
+                            _buildProfeshBranding(),
+                          ],
+                        ),
                 ),
               ),
             ),
@@ -348,30 +426,30 @@ class _LandingScreenState extends State<LandingScreen>
               ],
             ),
           ),
-          Container(
-            width: isMobile ? 50 : 60,
-            height: isMobile ? 50 : 60,
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: ThemeColors.neutral1.color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: ThemeColors.mauve300.color.withValues(alpha: 0.3),
-                width: 1,
-              ),
-            ),
-            child: Image.asset(
-              Images.logo.path,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) {
-                return Icon(
-                  Icons.business,
-                  color: ThemeColors.mauve300.color,
-                  size: isMobile ? 24 : 32,
-                );
-              },
-            ),
-          ),
+          // Container(
+          //   width: isMobile ? 50 : 60,
+          //   height: isMobile ? 50 : 60,
+          //   padding: const EdgeInsets.all(8),
+          //   decoration: BoxDecoration(
+          //     color: ThemeColors.neutral1.color.withValues(alpha: 0.1),
+          //     borderRadius: BorderRadius.circular(12),
+          //     border: Border.all(
+          //       color: ThemeColors.mauve300.color.withValues(alpha: 0.3),
+          //       width: 1,
+          //     ),
+          //   ),
+          //   child: Image.asset(
+          //     Images.logo.path,
+          //     fit: BoxFit.contain,
+          //     errorBuilder: (context, error, stackTrace) {
+          //       return Icon(
+          //         Icons.business,
+          //         color: ThemeColors.mauve300.color,
+          //         size: isMobile ? 24 : 32,
+          //       );
+          //     },
+          //   ),
+          // ),
         ],
       ),
     );
@@ -423,7 +501,7 @@ class _LandingScreenState extends State<LandingScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Job Description',
+                  'Job Brief',
                   style: TextStyle(
                     color: ThemeColors.lime200.color,
                     fontSize: isMobile ? 16 : 18,
@@ -448,53 +526,74 @@ class _LandingScreenState extends State<LandingScreen>
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildInfoChip(
-                      Icons.location_on,
-                      jobData?['location'] ?? 'Location not specified',
-                      ThemeColors.mauve300.color,
-                      ThemeColors.mauve100.color,
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      children: [
+                        _buildInfoChip(
+                          Icons.location_on,
+                          jobData?['location'] ?? 'Location not specified',
+                          ThemeColors.mauve300.color,
+                          ThemeColors.mauve100.color,
+                        ),
+                        const SizedBox(height: 8),
+                        _buildInfoChip(
+                          Icons.access_time,
+                          jobData?['type'] ?? 'Full-time',
+                          ThemeColors.slateGreen200.color,
+                          ThemeColors.slateGreen100.color,
+                        ),
+                        if (jobData?['role'] != null) ...[
+                          const SizedBox(height: 8),
+                          _buildInfoChip(
+                            Icons.work,
+                            jobData!['role'],
+                            ThemeColors.lime200.color,
+                            ThemeColors.lime100.color,
+                          ),
+                        ],
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                    _buildInfoChip(
-                      Icons.access_time,
-                      jobData?['type'] ?? 'Full-time',
-                      ThemeColors.slateGreen200.color,
-                      ThemeColors.slateGreen100.color,
-                    ),
-                    if (jobData?['stipend'] != null) ...[
-                      const SizedBox(height: 8),
-                      _buildInfoChip(
-                        Icons.currency_rupee,
-                        jobData!['stipend'].toString(),
-                        ThemeColors.lime200.color,
-                        ThemeColors.lime100.color,
-                      ),
+                    if (jobData?['jdPdf'] != null) ...[
+                      const SizedBox(height: 12),
+                      _buildPdfButton(),
                     ],
                   ],
                 )
-              : Wrap(
-                  spacing: 12,
-                  runSpacing: 8,
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildInfoChip(
-                      Icons.location_on,
-                      jobData?['location'] ?? 'Location not specified',
-                      ThemeColors.mauve300.color,
-                      ThemeColors.mauve100.color,
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 8,
+                      children: [
+                        _buildInfoChip(
+                          Icons.location_on,
+                          jobData?['location'] ?? 'Location not specified',
+                          ThemeColors.mauve300.color,
+                          ThemeColors.mauve100.color,
+                        ),
+                        _buildInfoChip(
+                          Icons.access_time,
+                          jobData?['type'] ?? 'Full-time',
+                          ThemeColors.slateGreen200.color,
+                          ThemeColors.slateGreen100.color,
+                        ),
+
+                        if (jobData?['role'] != null) ...[
+                          _buildInfoChip(
+                            Icons.work,
+                            jobData!['role'].toString(),
+                            ThemeColors.lime200.color,
+                            ThemeColors.lime100.color,
+                          ),
+                        ],
+                      ],
                     ),
-                    _buildInfoChip(
-                      Icons.access_time,
-                      jobData?['type'] ?? 'Full-time',
-                      ThemeColors.slateGreen200.color,
-                      ThemeColors.slateGreen100.color,
-                    ),
-                    if (jobData?['stipend'] != null)
-                      _buildInfoChip(
-                        Icons.currency_rupee,
-                        jobData!['stipend'].toString(),
-                        ThemeColors.lime200.color,
-                        ThemeColors.lime100.color,
-                      ),
+                    if (jobData?['jdPdf'] != null) ...[
+                      const SizedBox(width: 12),
+                      _buildPdfButton(),
+                    ],
                   ],
                 ),
         ],
@@ -605,6 +704,273 @@ class _LandingScreenState extends State<LandingScreen>
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPdfButton() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth <= 600;
+    final isDesktop = screenWidth > 720;
+    print('isMobile : $isMobile');
+    return Center(
+      child: Container(
+        width: isDesktop ? 190 : double.infinity,
+        constraints: const BoxConstraints(maxWidth: 300),
+        height: 45,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [ThemeColors.lime200.color, ThemeColors.lime500.color],
+          ),
+          borderRadius: BorderRadius.circular(32),
+          boxShadow: [
+            BoxShadow(
+              color: ThemeColors.lime500.color.withValues(alpha: 0.4),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: ElevatedButton(
+          onPressed: () {
+            if (jobData?['jdPdf'] != null) {
+              _showPdfDialogue(
+                jobData?['jdPdf'],
+                fileName: jobData?['jdPdfName'],
+              );
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            foregroundColor: ThemeColors.slateGreen900.color,
+            elevation: 0,
+            shadowColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.description,
+                size: isMobile ? 17 : 20,
+                color: ThemeColors.slateGreen900.color,
+              ),
+              SizedBox(width: isMobile ? 6 : 8),
+              Text(
+                'Full Job Description',
+                style: TextStyle(
+                  fontSize: isMobile ? 10 : 12,
+                  fontWeight: FontWeight.bold,
+                  color: ThemeColors.slateGreen900.color,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<bool?> _showPdfDialogue(String fileUrl, {String? fileName}) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isMobile = screenWidth <= 600;
+
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext ctx) {
+        return Dialog(
+          insetPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+          backgroundColor: Colors.transparent,
+          child: SizedBox(
+            height: screenHeight,
+            width: isMobile ? screenWidth : screenWidth * .6,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: ThemeColors.neutral1.color,
+                        ),
+                        width: 50,
+                        height: 50,
+                        child: Icon(
+                          Icons.close,
+                          color: ThemeColors.neutral6.color,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: screenHeight * 0.7,
+                  width: isMobile ? double.infinity : screenWidth * 0.9,
+                  child: SingleChildScrollView(
+                    child: PDFPreviewWidget(
+                      pdfFile: XFile(""),
+                      onReselect: () {},
+                      onConfirm: () {},
+                      showActions: false,
+                      fileUrl: fileUrl,
+                      fileName: fileName ?? "",
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  _buildProfeshBranding() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth <= 600;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          "Powered by ",
+          style: TextStyle(
+            color: ThemeColors.neutral1.color,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        SizedBox(
+          width: isMobile ? 50 : 60,
+          height: isMobile ? 50 : 60,
+
+          child: Image.asset(
+            Images.logo.path,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return Icon(
+                Icons.business,
+                color: ThemeColors.mauve300.color,
+                size: isMobile ? 24 : 32,
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  _buildJobDetailsButton() {
+    return Positioned(
+      right: 0,
+      left: 0,
+      bottom: 80,
+      child: Center(
+        child: Container(
+          width: 100,
+          constraints: const BoxConstraints(maxWidth: 300),
+          height: 45,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [ThemeColors.mauve500.color, ThemeColors.mauve700.color],
+            ),
+            borderRadius: BorderRadius.circular(32),
+            boxShadow: [
+              BoxShadow(
+                color: ThemeColors.mauve500.color.withValues(alpha: 0.4),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ElevatedButton(
+            onPressed: () => _toggleJobDescription(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              foregroundColor: ThemeColors.neutral1.color,
+              elevation: 0,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 2),
+            ),
+            child: Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(Icons.info, size: 17, color: ThemeColors.neutral1.color),
+                  SizedBox(width: 2),
+                  Text(
+                    'Job Details',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: ThemeColors.neutral1.color,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  _buildJobDetailsOverlay() {
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.black.withOpacity(0.8),
+              Colors.black.withOpacity(0.6),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: ThemeColors.lime500.color.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: Stack(
+          children: [
+            _buildJobCard(),
+            Positioned(
+              top: 0,
+              left: 0,
+              child: GestureDetector(
+                onTap: () {
+                  _toggleJobDescription();
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.transparent,
+                    border: Border.all(color: ThemeColors.neutral3.color),
+                  ),
+                  width: 40,
+                  height: 40,
+                  child: Icon(Icons.close, color: ThemeColors.neutral3.color),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

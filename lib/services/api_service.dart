@@ -21,17 +21,20 @@ class ApiService {
 
       if (response['error'] == null) {
         final res = response['data'];
+        print(res);
         return {
           'success': true,
           'title': res['projectName'] ?? 'Job Position',
           'company': res['companyName'] ?? 'Company',
           'description': res['jobBrief'] ?? 'Job description not available',
           'location': res['location'] ?? 'Location not specified',
+          'role': res['jobRole'],
           'type': res['type'] ?? 'Full-time',
           'stipend': res['stipend'],
-          'logo': response['logo'],
-          'videoUrl': response['videoUrl'] ?? '',
-          'jdPdf': response['jdUrl'] ?? '',
+          'logo': res['companyLogoUrl'],
+          'videoUrl': res['videoUrl'] ?? '',
+          'jdPdf': res['jdUrl'] ?? '',
+          'jdPdfName': res['jdFileName'],
         };
       } else {
         debugPrint('Error getting job details: ${response['error']}');

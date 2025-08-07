@@ -8,6 +8,8 @@ class PDFPreviewWidget extends StatefulWidget {
   final VoidCallback onReselect;
   final VoidCallback? onConfirm;
   final bool showActions;
+  final String fileName;
+  final String fileUrl;
 
   const PDFPreviewWidget({
     super.key,
@@ -15,6 +17,8 @@ class PDFPreviewWidget extends StatefulWidget {
     required this.onReselect,
     this.onConfirm,
     this.showActions = true,
+    this.fileName = "",
+    this.fileUrl = "",
   });
 
   @override
@@ -26,6 +30,7 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
   bool _isLoading = true;
   bool _hasError = false;
   String? _errorMessage;
+  String? fileSize;
 
   @override
   void initState() {
@@ -39,7 +44,7 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
       _hasError = false;
       _errorMessage = null;
     });
-
+    _getFileSize();
     // Add a small delay to show loading state
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
@@ -50,18 +55,20 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
     });
   }
 
-  Future<String> _getFileSize() async {
+  Future<void> _getFileSize() async {
     try {
       final bytes = await widget.pdfFile.length();
       if (bytes < 1024) {
-        return '$bytes B';
+        fileSize = '$bytes B';
       } else if (bytes < 1048576) {
-        return '${(bytes / 1024).toStringAsFixed(1)} KB';
+        fileSize = '${(bytes / 1024).toStringAsFixed(1)} KB';
       } else {
-        return '${(bytes / 1048576).toStringAsFixed(1)} MB';
+        fileSize = '${(bytes / 1048576).toStringAsFixed(1)} MB';
       }
     } catch (e) {
-      return 'Unknown size';
+      fileSize = 'Unknown size';
+    } finally {
+      setState(() {});
     }
   }
 
@@ -81,7 +88,7 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(isMobile ? 16 : 20),
+      padding: EdgeInsets.all(isMobile ? 10 : 20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -138,8 +145,9 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
   }
 
   Widget _buildFileInfo() {
-    final fileName = widget.pdfFile.path.split('/').last;
-    final fileSize = _getFileSize();
+    final fileName = (widget.fileName.isNotEmpty)
+        ? widget.fileName
+        : widget.pdfFile.path.split('/').last;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -261,6 +269,40 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
     }
 
     try {
+      if (widget.fileUrl.isNotEmpty) {
+        return PdfViewer.uri(
+          Uri.parse(widget.fileUrl),
+          controller: _pdfViewerController,
+          params: PdfViewerParams(
+            // Show loading indicator
+            loadingBannerBuilder: (context, bytesDownloaded, totalBytes) =>
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        color: ThemeColors.lime500.color,
+                        value: totalBytes != null
+                            ? bytesDownloaded / totalBytes
+                            : null,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Loading PDF...',
+                        style: TextStyle(
+                          color: ThemeColors.neutral4.color,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+            // Set background color
+            backgroundColor: ThemeColors.neutral1.color,
+          ),
+        );
+      }
       return PdfViewer.file(
         widget.pdfFile.path,
         controller: _pdfViewerController,
@@ -346,9 +388,11 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
+                padding: EdgeInsets.zero,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.refresh,
@@ -400,9 +444,11 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  padding: EdgeInsets.zero,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Icon(
                       Icons.check,

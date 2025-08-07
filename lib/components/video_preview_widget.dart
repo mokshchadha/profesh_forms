@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -11,6 +10,9 @@ class VideoPreviewWidget extends StatefulWidget {
   final VoidCallback? onConfirm;
   final bool showActions;
   final bool autoPlay;
+  final String videoUrl;
+  final bool hideFileInfo;
+  final bool isJobVideo;
 
   const VideoPreviewWidget({
     super.key,
@@ -19,6 +21,9 @@ class VideoPreviewWidget extends StatefulWidget {
     this.onConfirm,
     this.showActions = true,
     this.autoPlay = false,
+    this.videoUrl = "",
+    this.hideFileInfo = false,
+    this.isJobVideo = false,
   });
 
   @override
@@ -31,6 +36,8 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
   bool _isInitializing = true;
   bool _hasError = false;
   String? _errorMessage;
+  Duration? _videoDuration;
+  String? fileSize;
 
   @override
   void initState() {
@@ -47,8 +54,13 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
       });
 
       _videoPlayerController = VideoPlayerController.networkUrl(
-        Uri.parse(widget.videoFile.path),
+        Uri.parse(
+          (widget.videoUrl.isNotEmpty)
+              ? widget.videoUrl
+              : widget.videoFile.path,
+        ),
       );
+      _getFileSize();
       await _videoPlayerController!.initialize();
 
       _chewieController = ChewieController(
@@ -124,6 +136,31 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
     }
   }
 
+  Future<void> _getFileSize() async {
+    try {
+      final bytes = await widget.videoFile.length();
+      if (bytes < 1024) {
+        fileSize = '$bytes B';
+      } else if (bytes < 1048576) {
+        fileSize = '${(bytes / 1024).toStringAsFixed(1)} KB';
+      } else {
+        fileSize = '${(bytes / 1048576).toStringAsFixed(1)} MB';
+      }
+    } catch (e) {
+      fileSize = 'Unknown size';
+    } finally {
+      setState(() {});
+    }
+  }
+
+  String _formatDuration(Duration? duration) {
+    if (duration == null) return 'Unknown';
+
+    final minutes = duration.inMinutes;
+    final seconds = duration.inSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
   @override
   void dispose() {
     _chewieController?.dispose();
@@ -134,6 +171,7 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     final isMobile = screenWidth <= 600;
 
     return Container(
@@ -165,12 +203,17 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header with file info
-          // _buildFileInfo(),
-          SizedBox(height: isMobile ? 16 : 20),
-
+          if (!widget.hideFileInfo) ...[
+            _buildFileInfo(),
+            SizedBox(height: isMobile ? 16 : 20),
+          ],
           // Video Preview
           Container(
-            height: isMobile ? 300 : 400,
+            height: widget.isJobVideo
+                ? screenHeight * 0.65
+                : isMobile
+                ? 300
+                : 400,
             decoration: BoxDecoration(
               color: Colors.black,
               borderRadius: BorderRadius.circular(12),
@@ -179,6 +222,7 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
                 width: 1,
               ),
             ),
+            alignment: Alignment.center,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: _buildVideoContent(),
@@ -195,6 +239,8 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
   }
 
   Widget _buildFileInfo() {
+    final duration = _formatDuration(_videoDuration);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -312,9 +358,11 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
+                padding: EdgeInsets.zero,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.refresh,
@@ -323,7 +371,7 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
                   ),
                   SizedBox(width: isMobile ? 6 : 8),
                   Text(
-                    'Reupload',
+                    'Retry',
                     style: TextStyle(
                       fontSize: isMobile ? 10 : 16,
                       fontWeight: FontWeight.w600,
@@ -366,9 +414,11 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  padding: EdgeInsets.zero,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Icon(
                       Icons.check,

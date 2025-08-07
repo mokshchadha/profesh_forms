@@ -309,7 +309,7 @@ class _AlreadyAppliedScreenState extends State<AlreadyAppliedScreen>
     final features = [
       {
         'icon': Icons.notifications_active,
-        'text': 'For more detailed updates. Download the Profesh app',
+        'text': 'To track the status of your application. Download the Profesh app',
       },
       {'icon': Icons.speed, 'text': 'Fast-track review process'},
       {

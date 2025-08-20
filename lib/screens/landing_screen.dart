@@ -554,7 +554,8 @@ class _LandingScreenState extends State<LandingScreen>
                         ],
                       ],
                     ),
-                    if (jobData?['jdPdf'] != null) ...[
+                    if (jobData?['jdPdf'] != null &&
+                        jobData?['jdPdf'] != "") ...[
                       const SizedBox(height: 12),
                       _buildPdfButton(),
                     ],
@@ -590,7 +591,8 @@ class _LandingScreenState extends State<LandingScreen>
                         ],
                       ],
                     ),
-                    if (jobData?['jdPdf'] != null) ...[
+                    if (jobData?['jdPdf'] != null &&
+                        jobData?['jdPdf'] != "") ...[
                       const SizedBox(width: 12),
                       _buildPdfButton(),
                     ],
@@ -713,7 +715,6 @@ class _LandingScreenState extends State<LandingScreen>
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 600;
     final isDesktop = screenWidth > 720;
-    print('isMobile : $isMobile');
     return Center(
       child: Container(
         width: isDesktop ? 190 : double.infinity,

@@ -115,7 +115,7 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header with file info
-          _buildFileInfo(),
+          // _buildFileInfo(),
           SizedBox(height: isMobile ? 16 : 20),
 
           // PDF Preview
@@ -403,7 +403,7 @@ class _PDFPreviewWidgetState extends State<PDFPreviewWidget> {
                   Text(
                     'Reupload',
                     style: TextStyle(
-                      fontSize: isMobile ? 14 : 16,
+                      fontSize: isMobile ? 12 : 16,
                       fontWeight: FontWeight.w600,
                       color: ThemeColors.mauve300.color,
                     ),

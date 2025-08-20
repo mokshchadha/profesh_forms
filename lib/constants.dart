@@ -21,11 +21,7 @@ extension ProjectStatusTypeExtension on ProjectStatusType {
   }
 }
 
-enum Avatars {
-  yellow,
-  blue,
-  green,
-}
+enum Avatars { yellow, blue, green }
 
 extension AvatarsExtension on Avatars {
   String get url {
@@ -41,7 +37,7 @@ extension AvatarsExtension on Avatars {
     }
   }
 }
- 
+
 enum CandidateStatus { shortlisted, viewed, rejected, unreviewed }
 
 enum InterviewStatus { schedule, invalid }
@@ -175,23 +171,19 @@ extension ThemeColorExtension on ThemeColors {
   }
 }
 
-enum Images {
-
-  logo,
-  
-}
+enum Images { logo }
 
 extension ImagesExtension on Images {
   AssetImage get assetImage {
     switch (this) {
-    case Images.logo:
+      case Images.logo:
         return const AssetImage('assets/logo.png');
     }
   }
 
   String get path {
     switch (this) {
-    case Images.logo:
+      case Images.logo:
         return 'assets/logo.png';
     }
   }
@@ -228,4 +220,4 @@ const profeshPublicURL = 'https://profesh.web.app';
 const watiNumber = '+918951437501';
 const contactUsEmail = 'team@joinprofesh.com';
 const downloadApp = 'https://profesh-app.netlify.app/';
-const serverUrl = sandboxURL;
+const serverUrl = prodUrl;

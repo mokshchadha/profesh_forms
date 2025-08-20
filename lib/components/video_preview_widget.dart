@@ -373,7 +373,7 @@ class _VideoPreviewWidgetState extends State<VideoPreviewWidget> {
                   Text(
                     'Retry',
                     style: TextStyle(
-                      fontSize: isMobile ? 11 : 16,
+                      fontSize: isMobile ? 10 : 16,
                       fontWeight: FontWeight.w600,
                       color: ThemeColors.mauve300.color,
                     ),
